@@ -5,101 +5,261 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Global Aging Tsunami - A Demographic Revolution</title>
     <script src="https://d3js.org/d3.v7.min.js"></script>
+    
     <style>
-        /* Basic styling for the narrative visualization */
-        body {
-            font-family: Arial, sans-serif;
+        /* Modern design inspired by premium design systems */
+        * {
             margin: 0;
-            padding: 20px;
-            background-color: #f5f5f5;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            color: #2d3748;
+            line-height: 1.6;
         }
         
         .container {
-            max-width: 1000px;
+            max-width: 1200px;
             margin: 0 auto;
-            background: white;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 20px;
         }
         
         .header {
             text-align: center;
-            margin-bottom: 30px;
-            padding: 20px;
-            background: linear-gradient(135deg, #667eea, #764ba2);
+            margin-bottom: 50px;
+            padding: 60px 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            border-radius: 10px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(102, 126, 234, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="white" opacity="0.1"/><circle cx="75" cy="75" r="1" fill="white" opacity="0.1"/><circle cx="50" cy="10" r="0.5" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+            opacity: 0.1;
         }
         
         .header h1 {
-            margin: 0 0 10px 0;
-            font-size: 2.5rem;
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            position: relative;
+            z-index: 1;
+            letter-spacing: -0.02em;
         }
         
-        /* Scene management - only show active scene */
+        .header p {
+            font-size: 1.25rem;
+            opacity: 0.9;
+            font-weight: 400;
+            position: relative;
+            z-index: 1;
+        }
+        
+        /* Scene cards with modern card design */
         .scene {
             display: none;
-            min-height: 500px;
+            background: white;
+            border-radius: 20px;
+            padding: 50px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            margin-bottom: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
         }
         
         .scene.active {
             display: block;
+            animation: slideIn 0.5s ease-out;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
         
         .scene h2 {
-            color: #333;
-            margin-bottom: 20px;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #1a202c;
+            margin-bottom: 30px;
             text-align: center;
+            letter-spacing: -0.025em;
         }
         
-        /* Annotation template for consistency */
+        /* Modern annotation cards */
         .annotation {
-            background: #fff3cd;
-            padding: 15px;
-            border-left: 4px solid #ffc107;
-            margin: 20px 0;
-            border-radius: 5px;
+            background: linear-gradient(135deg, #ffeaa7 0%, #fab1a0 100%);
+            padding: 25px 30px;
+            border-radius: 15px;
+            margin: 30px 0;
+            border: none;
+            box-shadow: 0 4px 15px rgba(255, 183, 77, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .annotation::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(to bottom, #fd79a8, #fdcb6e);
         }
         
         .annotation strong {
-            color: #856404;
+            color: #2d3748;
+            font-weight: 700;
+            font-size: 1.1em;
         }
         
-        .chart-container {
-            margin: 20px 0;
-            text-align: center;
-        }
-        
-        /* Navigation triggers */
-        .navigation {
-            text-align: center;
-            margin: 30px 0;
-        }
-        
-        .nav-btn {
-            background: #007bff;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            margin: 0 10px;
-            border-radius: 5px;
-            cursor: pointer;
+        .annotation p {
+            margin: 8px 0 0 0;
+            color: #2d3748;
             font-size: 1rem;
         }
         
+        .chart-container {
+            margin: 40px 0;
+            padding: 40px;
+            background: #f8fafc;
+            border-radius: 15px;
+            border: 1px solid #e2e8f0;
+            min-height: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .chart-container p {
+            color: #64748b;
+            font-size: 1.1rem;
+            font-style: italic;
+        }
+        
+        /* Modern navigation */
+        .navigation {
+            text-align: center;
+            margin: 40px 0;
+            padding: 30px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+        }
+        
+        .nav-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .nav-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+        
+        .nav-btn:hover::before {
+            left: 100%;
+        }
+        
         .nav-btn:hover {
-            background: #0056b3;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
         }
         
         .nav-btn:disabled {
-            background: #ccc;
+            background: #e2e8f0;
+            color: #94a3b8;
             cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .nav-btn:disabled::before {
+            display: none;
         }
         
         .scene-counter {
-            margin: 0 20px;
-            font-weight: bold;
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #2d3748;
+            background: #f1f5f9;
+            padding: 12px 24px;
+            border-radius: 50px;
+            border: 2px solid #e2e8f0;
+        }
+        
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .header {
+                padding: 40px 25px;
+            }
+            
+            .header h1 {
+                font-size: 2.5rem;
+            }
+            
+            .scene {
+                padding: 30px 25px;
+            }
+            
+            .scene h2 {
+                font-size: 2rem;
+            }
+            
+            .navigation {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .nav-btn {
+                width: 100%;
+                max-width: 200px;
+            }
         }
     </style>
 </head>
