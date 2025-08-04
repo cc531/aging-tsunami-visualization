@@ -49,15 +49,15 @@
 
     const tooltip = d3.select("#tooltip");
 
-    // 載入 CSV 資料
+    // Load CSV file (must be served by GitHub Pages, not locally)
     d3.csv("population_data.csv").then(data => {
-      // 資料預處理：轉換數值欄位
+      // Convert Year and Population columns to numbers
       data.forEach(d => {
         d.Year = +d.Year;
         d["65+ Population"] = +d["65+ Population"];
       });
 
-      // 設定 X/Y 軸比例尺
+      // Set up scales
       const x = d3.scaleLinear()
         .domain(d3.extent(data, d => d.Year))
         .range([0, width]);
@@ -67,20 +67,21 @@
         .nice()
         .range([height, 0]);
 
-      // X 軸
+      // Add X Axis
       svg.append("g")
         .attr("transform", `translate(0, ${height})`)
         .call(d3.axisBottom(x).tickFormat(d3.format("d")));
 
-      // Y 軸
+      // Add Y Axis
       svg.append("g")
         .call(d3.axisLeft(y));
 
-      // 折線圖
+      // Line generator
       const line = d3.line()
         .x(d => x(d.Year))
         .y(d => y(d["65+ Population"]));
 
+      // Add line to SVG
       svg.append("path")
         .datum(data)
         .attr("fill", "none")
@@ -88,7 +89,7 @@
         .attr("stroke-width", 2)
         .attr("d", line);
 
-      // 圓點 + tooltip
+      // Add dots with tooltip
       svg.selectAll("circle")
         .data(data)
         .enter()
@@ -98,7 +99,8 @@
         .attr("r", 4)
         .attr("fill", "#007acc")
         .on("mouseover", (event, d) => {
-          tooltip.style("opacity", 1)
+          tooltip
+            .style("opacity", 1)
             .html(`<strong>Year:</strong> ${d.Year}<br/><strong>65+ Pop:</strong> ${d["65+ Population"].toLocaleString()}`)
             .style("left", `${event.pageX + 10}px`)
             .style("top", `${event.pageY - 28}px`);
@@ -106,9 +108,8 @@
         .on("mouseout", () => {
           tooltip.style("opacity", 0);
         });
-
     }).catch(error => {
-      console.error("資料讀取失敗:", error);
+      console.error("Failed to load CSV:", error);
     });
   </script>
 </body>
