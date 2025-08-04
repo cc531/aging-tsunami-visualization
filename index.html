@@ -336,6 +336,7 @@
     <script>
         // Parameters - state variables for the narrative visualization
         let currentScene = 1;
+        let globalData = null;
         const totalScenes = 4;
         
         // Scene management functions (Triggers)
@@ -374,10 +375,28 @@
             document.getElementById('nextBtn').disabled = (currentScene === totalScenes);
             document.getElementById('sceneCounter').textContent = `${currentScene} / ${totalScenes}`;
         }
+
+        // Load and process the CSV data
+        async function loadData() {
+            try {
+                console.log('Loading population data...');
+                const data = await d3.csv("https://raw.githubusercontent.com/cc531/aging-tsunami-visualization/main/population_data.csv");
+                
+                globalData = data;
+                console.log('Data loaded successfully:', globalData);
+        
+                // Optional: You can render scene data here if needed
+                // renderSceneData(currentScene);
+            } catch (error) {
+                console.error('Error loading CSV:', error);
+            }
+        }
+
         
         // Initialize the visualization
         document.addEventListener('DOMContentLoaded', function() {
             showScene(1);
+            loadData(); // ← add this to load your CSV data
             console.log('Aging Tsunami visualization initialized');
         });
 
