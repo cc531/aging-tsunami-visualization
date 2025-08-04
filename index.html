@@ -380,6 +380,55 @@
             showScene(1);
             console.log('Aging Tsunami visualization initialized');
         });
+
+        let currentScene = 1;
+        const totalScenes = 4;
+        let globalData = null;
+    
+        function showScene(sceneNum) {
+            document.querySelectorAll('.scene').forEach(scene => {
+                scene.classList.remove('active');
+            });
+            document.getElementById(`scene${sceneNum}`).classList.add('active');
+            updateNavigation();
+            console.log(`Showing scene ${sceneNum}`);
+        }
+    
+        function nextScene() {
+            if (currentScene < totalScenes) {
+                currentScene++;
+                showScene(currentScene);
+            }
+        }
+    
+        function previousScene() {
+            if (currentScene > 1) {
+                currentScene--;
+                showScene(currentScene);
+            }
+        }
+    
+        function updateNavigation() {
+            document.getElementById('prevBtn').disabled = (currentScene === 1);
+            document.getElementById('nextBtn').disabled = (currentScene === totalScenes);
+            document.getElementById('sceneCounter').textContent = `${currentScene} / ${totalScenes}`;
+        }
+    
+        async function loadData() {
+            try {
+                const data = await d3.csv("https://raw.githubusercontent.com/cc531/aging-tsunami-visualization/main/population_data.csv");
+                globalData = data;
+                console.log("CSV loaded successfully:", globalData);
+                showScene(currentScene); // Start with the first scene after data is ready
+            } catch (err) {
+                console.error("Failed to load CSV:", err);
+            }
+        }
+    
+        document.addEventListener('DOMContentLoaded', function() {
+            loadData();
+            console.log('Aging Tsunami visualization initialized');
+        }); 
     </script>
 </body>
 </html>
