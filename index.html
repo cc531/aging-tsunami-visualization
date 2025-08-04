@@ -305,6 +305,25 @@
             border-color: #94a3b8;
         }
 
+        .chart-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center; 
+            justify-content: center;
+        }
+        
+        #countrySelector {
+            max-width: 280px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        .selector-wrapper {
+            margin-bottom: 20px;
+        }
+
+
 
 
      
@@ -805,29 +824,48 @@
 
         function populateCountrySelector() {
             const selector = d3.select("#countrySelector");
-            const countries = Array.from(new Set(globalData.map(d => d.Country))).sort()
-
         
+            
+            const allCountries = Array.from(new Set(globalData.map(d => d.Country))).sort();
+        
+            
+            const excludedGroups = [
+                "World", "High income", "Low income", "Upper middle income", "Lower middle income",
+                "IBRD only", "IDA only", "IDA & IBRD total", "IDA blend", "IDA total",
+                "Heavily indebted poor countries (HIPC)", "Least developed countries: UN classification",
+                "Fragile and conflict affected situations", "Post-demographic dividend",
+                "Pre-demographic dividend", "Sub-Saharan Africa", "Euro area",
+                "Arab World", "East Asia & Pacific", "Europe & Central Asia",
+                "Latin America & Caribbean", "Middle East & North Africa",
+                "South Asia", "North America", "OECD members", "Small states",
+                "Other small states", "Central Europe and the Baltics",
+                "Early-demographic dividend", "Middle East", "East Asia"
+            ];
+        
+            const countryList = allCountries.filter(c => !excludedGroups.includes(c));
+        
+            
             selector.selectAll("option")
-                .data(countries)
+                .data(countryList)
                 .enter()
                 .append("option")
                 .text(d => d)
                 .attr("value", d => d);
         
-    
+            
             const defaultCountry = "Japan";
             selector.property("value", defaultCountry);
             renderScene4Chart(defaultCountry);
+        
         
             selector.on("change", function () {
                 const selected = this.value;
                 if (selected) {
                     renderScene4Chart(selected);
                 }
-                    });
+            });
         }
-        
+
 
         function renderScene4Chart(selectedCountry) {
             const svgWidth = 800;
