@@ -622,6 +622,8 @@
                 .y(d => y(d["Population 60+"]))
                 .curve(d3.curveMonotoneX);
         
+            const tooltip = d3.select(".tooltip");
+        
             for (const [country, data] of nested) {
                 data.sort((a, b) => +a.Year - +b.Year);
         
@@ -631,11 +633,11 @@
                     .attr("stroke", countryColors[country])
                     .attr("stroke-width", 3)
                     .attr("d", line)
-                    .attr("stroke-dasharray", function() {
+                    .attr("stroke-dasharray", function () {
                         const len = this.getTotalLength();
                         return len + " " + len;
                     })
-                    .attr("stroke-dashoffset", function() {
+                    .attr("stroke-dashoffset", function () {
                         return this.getTotalLength();
                     });
         
@@ -644,7 +646,7 @@
                     .ease(d3.easeCubic)
                     .attr("stroke-dashoffset", 0);
         
-                // Draw points with tooltip
+                // Dots + tooltip
                 svg.selectAll(`.dot-${country.replace(" ", "-")}`)
                     .data(data)
                     .enter()
@@ -652,7 +654,7 @@
                     .attr("class", `dot-${country.replace(" ", "-")}`)
                     .attr("cx", d => x(+d.Year))
                     .attr("cy", d => y(d["Population 60+"]))
-                    .attr("r", 3.5)
+                    .attr("r", 4)
                     .attr("fill", countryColors[country])
                     .on("mouseover", (event, d) => {
                         tooltip
@@ -663,7 +665,33 @@
                     })
                     .on("mouseout", () => tooltip.style("opacity", 0));
             }
+        
+            // 🔍 Annotation: highlight when Korea > Japan
+            const korea = nested.get("South Korea").filter(d => d.Year === "2045")[0];
+            const japan = nested.get("Japan").filter(d => d.Year === "2045")[0];
+        
+            if (korea && japan && korea["Population 60+"] > japan["Population 60+"]) {
+                const year = 2045;
+                const xPos = x(year);
+                svg.append("line")
+                    .attr("x1", xPos)
+                    .attr("x2", xPos)
+                    .attr("y1", 0)
+                    .attr("y2", height)
+                    .attr("stroke", "#e11d48")
+                    .attr("stroke-dasharray", "4 4")
+                    .attr("stroke-width", 2);
+        
+                svg.append("text")
+                    .attr("x", xPos + 5)
+                    .attr("y", 20)
+                    .text("⚡ Korea surpasses Japan (2045)")
+                    .attr("fill", "#e11d48")
+                    .attr("font-size", "14px")
+                    .attr("font-weight", "600");
+            }
         }
+
 
         function transformData(data) {
             const transformed = [];
