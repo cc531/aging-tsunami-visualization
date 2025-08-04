@@ -486,11 +486,9 @@
                 const data = await d3.csv("https://raw.githubusercontent.com/cc531/aging-tsunami-visualization/main/population_data.csv");
                 globalData = transformData(data); 
                 console.log("CSV loaded successfully:", globalData);
-                renderScene1Chart();
-
                 console.log("First row sample:", globalData[0]);
-                
-                showScene(currentScene);
+                showScene(currentScene);     
+                renderScene1Chart();  
             } catch (err) {
             console.error("Failed to load CSV:", err);
             }
