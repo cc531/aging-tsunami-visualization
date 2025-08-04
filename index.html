@@ -611,6 +611,7 @@
         
             const years = [...new Set(filtered.map(d => +d.Year))].sort((a, b) => a - b);
             const x = d3.scaleLinear().domain(d3.extent(years)).range([0, width]);
+            
             const y = d3.scaleLinear()
                 .domain([0, 35]) 
                 .nice()
@@ -618,9 +619,30 @@
         
             svg.append("g")
                 .call(d3.axisLeft(y).tickFormat(d => d + "%")); 
+            
             svg.append("g")
                 .attr("transform", `translate(0,${height})`)
                 .call(d3.axisBottom(x).tickFormat(d3.format("d"))); 
+
+            // X：Year
+            svg.append("text")
+                .attr("x", width / 2)
+                .attr("y", height + 40)
+                .attr("text-anchor", "middle")
+                .attr("font-size", "14px")
+                .attr("fill", "#334155")
+                .text("Year");
+            
+            // Y：Population Aged 60+ (% of total)
+            svg.append("text")
+                .attr("transform", "rotate(-90)")
+                .attr("x", -height / 2)
+                .attr("y", -45)
+                .attr("text-anchor", "middle")
+                .attr("font-size", "14px")
+                .attr("fill", "#334155")
+                .text("Population Aged 60+ (%)");
+
     
             const line = d3.line()
                 .x(d => x(+d.Year))
