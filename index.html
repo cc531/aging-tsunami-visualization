@@ -1,659 +1,133 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Global Aging Tsunami - A Demographic Revolution</title>
-    <script src="https://d3js.org/d3.v7.min.js"></script>
-    
-    <style>
-        /* Modern design inspired by premium design systems */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            min-height: 100vh;
-            color: #2d3748;
-            line-height: 1.6;
-        }
-        
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        
-        .header {
-            text-align: center;
-            margin-bottom: 50px;
-            padding: 60px 40px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(102, 126, 234, 0.3);
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .header::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="white" opacity="0.1"/><circle cx="75" cy="75" r="1" fill="white" opacity="0.1"/><circle cx="50" cy="10" r="0.5" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
-            opacity: 0.1;
-        }
-        
-        .header h1 {
-            font-size: 3.5rem;
-            font-weight: 700;
-            margin-bottom: 15px;
-            position: relative;
-            z-index: 1;
-            letter-spacing: -0.02em;
-        }
-        
-        .header p {
-            font-size: 1.25rem;
-            opacity: 0.9;
-            font-weight: 400;
-            position: relative;
-            z-index: 1;
-        }
-        
-        /* Scene cards with modern card design */
-        .scene {
-            display: none;
-            background: white;
-            border-radius: 20px;
-            padding: 50px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            margin-bottom: 30px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(10px);
-            transition: all 0.3s ease;
-        }
-        
-        .scene.active {
-            display: block;
-            animation: slideIn 0.5s ease-out;
-        }
-        
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        
-        .scene h2 {
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: #1a202c;
-            margin-bottom: 30px;
-            text-align: center;
-            letter-spacing: -0.025em;
-        }
-        
-        /* Modern annotation cards */
-        .annotation {
-            background: linear-gradient(135deg, #ffeaa7 0%, #fab1a0 100%);
-            padding: 25px 30px;
-            border-radius: 15px;
-            margin: 30px 0;
-            border: none;
-            box-shadow: 0 4px 15px rgba(255, 183, 77, 0.3);
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .annotation::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 4px;
-            height: 100%;
-            background: linear-gradient(to bottom, #fd79a8, #fdcb6e);
-        }
-        
-        .annotation strong {
-            color: #2d3748;
-            font-weight: 700;
-            font-size: 1.1em;
-        }
-        
-        .annotation p {
-            margin: 8px 0 0 0;
-            color: #2d3748;
-            font-size: 1rem;
-        }
-        
-        .chart-container {
-            margin: 40px 0;
-            padding: 40px;
-            background: #f8fafc;
-            border-radius: 15px;
-            border: 1px solid #e2e8f0;
-            min-height: 400px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .chart-container p {
-            color: #64748b;
-            font-size: 1.1rem;
-            font-style: italic;
-        }
-        
-        /* Modern navigation */
-        .navigation {
-            text-align: center;
-            margin: 40px 0;
-            padding: 30px;
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 20px;
-        }
-        
-        .nav-btn {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            padding: 15px 30px;
-            border-radius: 50px;
-            cursor: pointer;
-            font-size: 1rem;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .nav-btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-            transition: left 0.5s;
-        }
-        
-        .nav-btn:hover::before {
-            left: 100%;
-        }
-        
-        .nav-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
-        }
-        
-        .nav-btn:disabled {
-            background: #e2e8f0;
-            color: #94a3b8;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
-        
-        .nav-btn:disabled::before {
-            display: none;
-        }
-        
-        .scene-counter {
-            font-size: 1.2rem;
-            font-weight: 700;
-            color: #2d3748;
-            background: #f1f5f9;
-            padding: 12px 24px;
-            border-radius: 50px;
-            border: 2px solid #e2e8f0;
-        }
-        
-        /* Responsive design */
-        @media (max-width: 768px) {
-            .container {
-                padding: 15px;
-            }
-            
-            .header {
-                padding: 40px 25px;
-            }
-            
-            .header h1 {
-                font-size: 2.5rem;
-            }
-            
-            .scene {
-                padding: 30px 25px;
-            }
-            
-            .scene h2 {
-                font-size: 2rem;
-            }
-            
-            .navigation {
-                flex-direction: column;
-                gap: 15px;
-            }
-            
-            .nav-btn {
-                width: 100%;
-                max-width: 200px;
-            }
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <title>Global Population Visualization</title>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 40px;
+    }
+    #chart {
+      margin-top: 40px;
+    }
+    .bar {
+      fill: steelblue;
+    }
+    .axis-label {
+      font-size: 12px;
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <!-- Header -->
-        <div class="header">
-            <h1>🌊 Global Aging Tsunami</h1>
-            <p>The Unprecedented Demographic Revolution</p>
-        </div>
-        
-        <!-- Scene 1: Global Overview -->
-        <div id="scene1" class="scene active">
-            <h2>Scene 1: The Global Aging Reality</h2>
-            <div class="annotation">
-                <strong>Key Message:</strong> By 2050, the global population aged 60+ will double from 1.1 billion to 2.1 billion people - that's like 1.3 million people entering old age every week!
-            </div>
-            <div class="chart-container">
-                <div id="chart1">
-                    <p>Chart 1 will be displayed here</p>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Scene 2: Country Comparison -->
-        <div id="scene2" class="scene">
-            <h2>Scene 2: Extreme Contrasts</h2>
-            <div class="annotation">
-                <strong>Shocking Discovery:</strong> Japan has 29% of population over 65, while Nigeria and Kenya have median ages of just 18-19 years. Same planet, different worlds!
-            </div>
-            <div class="chart-container">
-                <div id="chart2">
-                    <p>Chart 2 will be displayed here</p>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Scene 3: Asian Aging Race -->
-        <div id="scene3" class="scene">
-            <h2>Scene 3: The Asian Aging Race</h2>
-            <div class="annotation">
-                <strong>Critical Trend:</strong> South Korea will overtake Japan as the world's most aged society by 2045. China's elderly population will surge from 8.3% to 23.9%.
-            </div>
-            <div class="chart-container">
-                <div id="chart3">
-                    <p>Chart 3 will be displayed here</p>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Scene 4: Interactive Exploration (Martini Glass "bottom") -->
-        <div id="scene4" class="scene">
-            <h2>Scene 4: Explore the Data</h2>
-            <div class="annotation">
-                <strong>Interactive Feature:</strong> Now you can explore! Click on any country to see detailed aging trends and projections.
-            </div>
-            <div class="chart-container">
-                <div id="chart4">
-                    <p>Interactive chart will be displayed here</p>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Navigation (Triggers) -->
-        <div class="navigation">
-            <button class="nav-btn" id="prevBtn" onclick="previousScene()">← Previous</button>
-            <span class="scene-counter" id="sceneCounter">1 / 4</span>
-            <button class="nav-btn" id="nextBtn" onclick="nextScene()">Next →</button>
-        </div>
-    </div>
-    
-    <script>
-        // Parameters - state variables for the narrative visualization
-        let currentScene = 1;
-        const totalScenes = 4;
-        let globalData = null; // Will store our CSV data
-        
-        // Load and process the CSV data
-        async function loadData() {
-            try {
-                console.log('Loading population data...');
-                const data = await d3.csv('population_data.csv');
-                
-                // Process the data for easier use
-                globalData = processData(data);
-                console.log('Data loaded successfully:', globalData);
-                
-                // Initialize visualization once data is loaded
-                showScene(currentScene);
-            } catch (error) {
-                console.error('Error loading data:', error);
-                // Fallback to sample data if CSV fails to load
-                globalData = createSampleData();
-                showScene(currentScene);
-            }
-        }
-        
-        // Process CSV data into usable format
-        function processData(rawData) {
-            // Get some key countries for visualization
-            const keyCountries = ['Japan', 'South Korea', 'China', 'Germany', 'United States', 'India', 'Nigeria'];
-            
-            const processedData = {
-                countries: [],
-                globalTrend: []
-            };
-            
-            // Process each row of CSV data
-            rawData.forEach(row => {
-                if (keyCountries.includes(row['Country Name'])) {
-                    const countryData = {
-                        name: row['Country Name'],
-                        code: row['Country Code'],
-                        values: []
-                    };
-                    
-                    // Extract years and values (World Bank data typically has years as columns)
-                    for (let year = 2000; year <= 2022; year++) {
-                        const value = parseFloat(row[year.toString()]);
-                        if (!isNaN(value)) {
-                            countryData.values.push({
-                                year: year,
-                                value: value
-                            });
-                        }
-                    }
-                    
-                    if (countryData.values.length > 0) {
-                        processedData.countries.push(countryData);
-                    }
-                }
-            });
-            
-            // Create global trend (simplified - using World average if available)
-            const worldRow = rawData.find(row => row['Country Name'] === 'World');
-            if (worldRow) {
-                for (let year = 2000; year <= 2022; year++) {
-                    const value = parseFloat(worldRow[year.toString()]);
-                    if (!isNaN(value)) {
-                        processedData.globalTrend.push({
-                            year: year,
-                            value: value
-                        });
-                    }
-                }
-            }
-            
-            return processedData;
-        }
-        
-        // Fallback sample data if CSV loading fails
-        function createSampleData() {
-            return {
-                globalTrend: [
-                    {year: 2000, value: 6.9},
-                    {year: 2005, value: 7.3},
-                    {year: 2010, value: 7.8},
-                    {year: 2015, value: 8.3},
-                    {year: 2020, value: 9.1},
-                    {year: 2022, value: 9.7}
-                ],
-                countries: [
-                    {
-                        name: 'Japan',
-                        values: [{year: 2000, value: 17.4}, {year: 2010, value: 23.0}, {year: 2020, value: 28.7}]
-                    },
-                    {
-                        name: 'South Korea', 
-                        values: [{year: 2000, value: 7.2}, {year: 2010, value: 11.1}, {year: 2020, value: 15.8}]
-                    },
-                    {
-                        name: 'China',
-                        values: [{year: 2000, value: 7.0}, {year: 2010, value: 8.4}, {year: 2020, value: 11.9}]
-                    }
-                ]
-            };
-        }
-        
-        // Scene management functions (Triggers)
-        function showScene(sceneNum) {
-            // Hide all scenes
-            document.querySelectorAll('.scene').forEach(scene => {
-                scene.classList.remove('active');
-            });
-            
-            // Show current scene
-            document.getElementById(`scene${sceneNum}`).classList.add('active');
-            
-            // Update navigation
-            updateNavigation();
-            
-            // Render appropriate chart for this scene
-            renderChart(sceneNum);
-        }
-        
-        function nextScene() {
-            if (currentScene < totalScenes) {
-                currentScene++;
-                showScene(currentScene);
-            }
-        }
-        
-        function previousScene() {
-            if (currentScene > 1) {
-                currentScene--;
-                showScene(currentScene);
-            }
-        }
-        
-        function updateNavigation() {
-            document.getElementById('prevBtn').disabled = (currentScene === 1);
-            document.getElementById('nextBtn').disabled = (currentScene === totalScenes);
-            document.getElementById('sceneCounter').textContent = `${currentScene} / ${totalScenes}`;
-        }
-        
-        // Chart rendering functions
-        function renderChart(sceneNum) {
-            switch(sceneNum) {
-                case 1:
-                    renderGlobalTrendChart();
-                    break;
-                case 2:
-                    renderCountryComparisonChart();
-                    break;
-                case 3:
-                    renderAsianTrendsChart();
-                    break;
-                case 4:
-                    renderInteractiveChart();
-                    break;
-            }
-        }
-        
-        // Scene 1: Global trend line chart
-        function renderGlobalTrendChart() {
-            const container = d3.select("#chart1");
-            container.selectAll("*").remove();
-            
-            if (!globalData || !globalData.globalTrend || globalData.globalTrend.length === 0) {
-                container.append("p")
-                    .text("Loading global aging trend data...")
-                    .style("text-align", "center")
-                    .style("color", "#64748b");
-                return;
-            }
-            
-            const margin = {top: 20, right: 30, bottom: 50, left: 60};
-            const width = 700 - margin.left - margin.right;
-            const height = 400 - margin.top - margin.bottom;
-            
-            const svg = container
-                .append("svg")
-                .attr("width", width + margin.left + margin.right)
-                .attr("height", height + margin.top + margin.bottom);
-            
-            const g = svg.append("g")
-                .attr("transform", `translate(${margin.left},${margin.top})`);
-            
-            // Scales
-            const xScale = d3.scaleLinear()
-                .domain(d3.extent(globalData.globalTrend, d => d.year))
-                .range([0, width]);
-            
-            const yScale = d3.scaleLinear()
-                .domain([0, d3.max(globalData.globalTrend, d => d.value) * 1.1])
-                .range([height, 0]);
-            
-            // Line generator
-            const line = d3.line()
-                .x(d => xScale(d.year))
-                .y(d => yScale(d.value))
-                .curve(d3.curveMonotoneX);
-            
-            // Add gradient
-            const gradient = svg.append("defs")
-                .append("linearGradient")
-                .attr("id", "line-gradient")
-                .attr("gradientUnits", "userSpaceOnUse")
-                .attr("x1", 0).attr("y1", height)
-                .attr("x2", 0).attr("y2", 0);
-            
-            gradient.append("stop")
-                .attr("offset", "0%")
-                .attr("stop-color", "#667eea");
-            
-            gradient.append("stop")
-                .attr("offset", "100%")
-                .attr("stop-color", "#764ba2");
-            
-            // Draw line
-            g.append("path")
-                .datum(globalData.globalTrend)
-                .attr("fill", "none")
-                .attr("stroke", "url(#line-gradient)")
-                .attr("stroke-width", 4)
-                .attr("d", line);
-            
-            // Add dots
-            g.selectAll(".dot")
-                .data(globalData.globalTrend)
-                .enter().append("circle")
-                .attr("class", "dot")
-                .attr("cx", d => xScale(d.year))
-                .attr("cy", d => yScale(d.value))
-                .attr("r", 6)
-                .attr("fill", "#667eea")
-                .attr("stroke", "#fff")
-                .attr("stroke-width", 2)
-                .style("cursor", "pointer")
-                .on("mouseover", function(event, d) {
-                    // Simple tooltip
-                    const tooltip = d3.select("body").append("div")
-                        .attr("class", "tooltip")
-                        .style("position", "absolute")
-                        .style("background", "rgba(0,0,0,0.8)")
-                        .style("color", "white")
-                        .style("padding", "8px")
-                        .style("border-radius", "4px")
-                        .style("font-size", "12px")
-                        .style("pointer-events", "none")
-                        .html(`<strong>${d.year}</strong><br/>65+ Population: ${d.value.toFixed(1)}%`);
-                    
-                    tooltip.style("left", (event.pageX + 10) + "px")
-                        .style("top", (event.pageY - 10) + "px");
-                })
-                .on("mouseout", function() {
-                    d3.selectAll(".tooltip").remove();
-                });
-            
-            // X axis
-            g.append("g")
-                .attr("transform", `translate(0,${height})`)
-                .call(d3.axisBottom(xScale).tickFormat(d3.format("d")))
-                .style("font-size", "12px");
-            
-            // Y axis
-            g.append("g")
-                .call(d3.axisLeft(yScale))
-                .style("font-size", "12px");
-            
-            // X axis label
-            g.append("text")
-                .attr("transform", `translate(${width/2}, ${height + 40})`)
-                .style("text-anchor", "middle")
-                .style("font-size", "14px")
-                .style("font-weight", "600")
-                .style("fill", "#2d3748")
-                .text("Year");
-            
-            // Y axis label
-            g.append("text")
-                .attr("transform", "rotate(-90)")
-                .attr("y", 0 - margin.left + 15)
-                .attr("x", 0 - (height / 2))
-                .style("text-anchor", "middle")
-                .style("font-size", "14px")
-                .style("font-weight", "600")
-                .style("fill", "#2d3748")
-                .text("Population 65+ (% of total)");
-        }
-        
-        // Placeholder functions for other scenes
-        function renderCountryComparisonChart() {
-            const container = d3.select("#chart2");
-            container.selectAll("*").remove();
-            container.append("p")
-                .text("Country comparison chart coming next...")
-                .style("text-align", "center")
-                .style("color", "#64748b");
-        }
-        
-        function renderAsianTrendsChart() {
-            const container = d3.select("#chart3");
-            container.selectAll("*").remove();
-            container.append("p")
-                .text("Asian trends chart coming next...")
-                .style("text-align", "center")
-                .style("color", "#64748b");
-        }
-        
-        function renderInteractiveChart() {
-            const container = d3.select("#chart4");
-            container.selectAll("*").remove();
-            container.append("p")
-                .text("Interactive exploration chart coming next...")
-                .style("text-align", "center")
-                .style("color", "#64748b");
-        }
-        
-        // Initialize the visualization when DOM is loaded
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('Aging Tsunami visualization initializing...');
-            loadData();
-        });
-    </script>
+  <h1>Global Population Visualization</h1>
+  <p>Use the Console to call <code>window.loadData()</code> to load your own <code>population_data.csv</code>.</p>
+  <div id="chart"></div>
+
+  <script>
+    // Make variables accessible in Console
+    window.globalData = null;
+    let currentScene = 0;
+
+    // CSV Loading Function
+    window.loadData = async function () {
+      try {
+        console.log('Loading population data...');
+        const data = await d3.csv('population_data.csv');
+        window.globalData = processData(data);
+        console.log('Data loaded successfully:', window.globalData);
+        showScene(currentScene);
+      } catch (error) {
+        console.error('Error loading data:', error);
+        window.globalData = createSampleData();
+        showScene(currentScene);
+      }
+    };
+
+    function processData(data) {
+      return data.map(d => ({
+        year: +d.year,
+        population: +d.population
+      }));
+    }
+
+    window.createSampleData = function () {
+      return [
+        { year: 2000, population: 6 },
+        { year: 2005, population: 6.5 },
+        { year: 2010, population: 7 },
+        { year: 2015, population: 7.3 },
+        { year: 2020, population: 7.8 }
+      ];
+    };
+
+    function showScene(sceneIndex) {
+      d3.select('#chart').selectAll('*').remove(); // Clear chart
+      if (!window.globalData) return;
+
+      if (sceneIndex === 0) {
+        renderGlobalTrendChart(window.globalData);
+      } else {
+        // Other scenes if needed
+      }
+    }
+
+    window.renderGlobalTrendChart = function (data) {
+      const width = 600;
+      const height = 400;
+      const margin = { top: 20, right: 30, bottom: 50, left: 60 };
+
+      const svg = d3.select('#chart')
+        .append('svg')
+        .attr('width', width)
+        .attr('height', height);
+
+      const x = d3.scaleBand()
+        .domain(data.map(d => d.year))
+        .range([margin.left, width - margin.right])
+        .padding(0.1);
+
+      const y = d3.scaleLinear()
+        .domain([0, d3.max(data, d => d.population)]).nice()
+        .range([height - margin.bottom, margin.top]);
+
+      svg.append('g')
+        .selectAll('rect')
+        .data(data)
+        .join('rect')
+        .attr('class', 'bar')
+        .attr('x', d => x(d.year))
+        .attr('y', d => y(d.population))
+        .attr('height', d => y(0) - y(d.population))
+        .attr('width', x.bandwidth());
+
+      svg.append('g')
+        .attr('transform', `translate(0,${height - margin.bottom})`)
+        .call(d3.axisBottom(x).tickFormat(d3.format('d')))
+        .append('text')
+        .attr('x', width / 2)
+        .attr('y', 40)
+        .attr('fill', 'black')
+        .attr('text-anchor', 'middle')
+        .text('Year');
+
+      svg.append('g')
+        .attr('transform', `translate(${margin.left},0)`)
+        .call(d3.axisLeft(y))
+        .append('text')
+        .attr('transform', 'rotate(-90)')
+        .attr('x', -height / 2)
+        .attr('y', -40)
+        .attr('fill', 'black')
+        .attr('text-anchor', 'middle')
+        .text('Population (Billions)');
+    }
+
+    // Optional: auto-load fallback data for preview
+    window.addEventListener('DOMContentLoaded', () => {
+      console.log("Ready. Use window.loadData() in Console to load your CSV.");
+    });
+  </script>
 </body>
 </html>
