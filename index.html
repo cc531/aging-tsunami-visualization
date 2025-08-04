@@ -435,16 +435,16 @@
                 .attr("fill", "#667eea");
         }
 
-    
+         
         async function loadData() {
             try {
                 const data = await d3.csv("https://raw.githubusercontent.com/cc531/aging-tsunami-visualization/main/population_data.csv");
-                globalData = data;
+                globalData = transformData(data); 
                 console.log("CSV loaded successfully:", globalData);
-                renderScene1Chart(); 
-                showScene(currentScene); // Start with the first scene after data is ready
+                renderScene1Chart();
+                showScene(currentScene);
             } catch (err) {
-                console.error("Failed to load CSV:", err);
+            console.error("Failed to load CSV:", err);
             }
         }
     
