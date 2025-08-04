@@ -334,6 +334,9 @@
                 <strong>Interactive Feature:</strong> Now you can explore! Click on any country to see detailed aging trends and projections.
             </div>
             <div class="chart-container">
+                <select id="countrySelector">
+                      <option value="">Select a Country</option>
+                    </select>
                 <div id="chart4">
                     <p>Interactive chart will be displayed here</p>
                 </div>
@@ -759,6 +762,122 @@
             }
         }
 
+        function populateCountrySelector() {
+            const uniqueCountries = Array.from(new Set(globalData.map(d => d.Country))).sort();
+            const selector = d3.select("#countrySelector");
+        
+            uniqueCountries.forEach(country => {
+                selector.append("option")
+                    .attr("value", country)
+                    .text(country);
+            });
+        
+            selector.on("change", function () {
+                const selected = this.value;
+                if (selected) {
+                    renderScene4Chart(selected);
+                }
+            });
+        }
+
+        function renderScene4Chart(selectedCountry) {
+            const svgWidth = 800;
+            const svgHeight = 400;
+            const margin = { top: 40, right: 20, bottom: 50, left: 60 };
+            const width = svgWidth - margin.left - margin.right;
+            const height = svgHeight - margin.top - margin.bottom;
+        
+            d3.select("#chart4").select("svg").remove();
+        
+            const countryData = globalData
+                .filter(d => d.Country === selectedCountry)
+                .sort((a, b) => +a.Year - +b.Year);
+        
+            const svg = d3.select("#chart4")
+                .append("svg")
+                .attr("width", svgWidth)
+                .attr("height", svgHeight)
+                .append("g")
+                .attr("transform", `translate(${margin.left},${margin.top})`);
+        
+            const x = d3.scaleLinear()
+                .domain(d3.extent(countryData, d => +d.Year))
+                .range([0, width]);
+        
+            const y = d3.scaleLinear()
+                .domain([0, 35])
+                .range([height, 0]);
+        
+            svg.append("g").call(d3.axisLeft(y).tickFormat(d => d + "%"));
+            svg.append("g")
+                .attr("transform", `translate(0,${height})`)
+                .call(d3.axisBottom(x).tickFormat(d3.format("d")));
+        
+            // X 軸標籤
+            svg.append("text")
+                .attr("x", width / 2)
+                .attr("y", height + 40)
+                .attr("text-anchor", "middle")
+                .attr("font-size", "14px")
+                .attr("fill", "#334155")
+                .text("Year");
+        
+            // Y 軸標籤
+            svg.append("text")
+                .attr("transform", "rotate(-90)")
+                .attr("x", -height / 2)
+                .attr("y", -50)
+                .attr("text-anchor", "middle")
+                .attr("font-size", "14px")
+                .attr("fill", "#334155")
+                .text("Population Aged 60+ (%)");
+        
+            const line = d3.line()
+                .x(d => x(+d.Year))
+                .y(d => y(d["Population 60+"]))
+                .curve(d3.curveMonotoneX);
+        
+            const path = svg.append("path")
+                .datum(countryData)
+                .attr("fill", "none")
+                .attr("stroke", "#0ea5e9")
+                .attr("stroke-width", 3)
+                .attr("d", line)
+                .attr("stroke-dasharray", function () {
+                    const len = this.getTotalLength();
+                    return len + " " + len;
+                })
+                .attr("stroke-dashoffset", function () {
+                    return this.getTotalLength();
+                })
+                .transition()
+                .duration(1500)
+                .ease(d3.easeCubic)
+                .attr("stroke-dashoffset", 0);
+        
+            const tooltip = d3.select(".tooltip");
+        
+            svg.selectAll(".dot")
+                .data(countryData)
+                .enter()
+                .append("circle")
+                .attr("class", "dot")
+                .attr("cx", d => x(+d.Year))
+                .attr("cy", d => y(d["Population 60+"]))
+                .attr("r", 4)
+                .attr("fill", "#0ea5e9")
+                .on("mouseover", (event, d) => {
+                    tooltip
+                        .style("opacity", 1)
+                        .html(`<strong>${d.Country}</strong><br>${d.Year}: ${d3.format(".1f")(d["Population 60+"])}%`)
+                        .style("left", (event.pageX + 10) + "px")
+                        .style("top", (event.pageY - 28) + "px");
+                })
+                        .on("mouseout", () => tooltip.style("opacity", 0));
+        }
+
+
+
 
         function transformData(data) {
             const transformed = [];
@@ -790,7 +909,8 @@
             }
         }
         document.addEventListener('DOMContentLoaded', async function() {
-            await loadData();        
+            await loadData(); 
+            populateCountrySelector();
             showScene(1);           
             console.log('Aging Tsunami visualization initialized');
         });
