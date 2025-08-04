@@ -448,6 +448,65 @@
             loadData();
             console.log('Aging Tsunami visualization initialized');
         }); 
+
+                // Load and process the CSV data
+        d3.csv("https://raw.githubusercontent.com/cc531/aging-tsunami-visualization/main/population_data.csv").then(data => {
+            console.log("Data loaded", data.slice(0, 5)); // For debugging
+        
+            // Filter: Get top 10 oldest countries in 2022
+            const year = "2022";
+            const parsed = data
+                .filter(d => d[year] !== "" && !isNaN(d[year]))
+                .map(d => ({ country: d["Country Name"], value: +d[year] }))
+                .sort((a, b) => b.value - a.value)
+                .slice(0, 10);
+        
+            // Draw Scene 1 chart (bar chart)
+            drawBarChart("#chart1", parsed, `Top 10 Oldest Countries (${year})`);
+        });
+        
+        function drawBarChart(containerId, data, title) {
+            d3.select(containerId).selectAll("*").remove(); // clear previous chart
+            const margin = { top: 40, right: 30, bottom: 40, left: 150 },
+                  width = 800 - margin.left - margin.right,
+                  height = 400 - margin.top - margin.bottom;
+        
+            const svg = d3.select(containerId)
+                .append("svg")
+                .attr("width", width + margin.left + margin.right)
+                .attr("height", height + margin.top + margin.bottom)
+                .append("g")
+                .attr("transform", `translate(${margin.left},${margin.top})`);
+        
+            const y = d3.scaleBand()
+                .domain(data.map(d => d.country))
+                .range([0, height])
+                .padding(0.1);
+        
+            const x = d3.scaleLinear()
+                .domain([0, d3.max(data, d => d.value)])
+                .range([0, width]);
+        
+            svg.selectAll("rect")
+                .data(data)
+                .enter()
+                .append("rect")
+                .attr("y", d => y(d.country))
+                .attr("width", d => x(d.value))
+                .attr("height", y.bandwidth())
+                .attr("fill", "#667eea");
+        
+            svg.append("g").call(d3.axisLeft(y));
+            svg.append("g").attr("transform", `translate(0,${height})`).call(d3.axisBottom(x));
+        
+            svg.append("text")
+                .attr("x", width / 2)
+                .attr("y", -15)
+                .attr("text-anchor", "middle")
+                .style("font-size", "20px")
+                .text(title);
+        }
+
     </script>
 </body>
 </html>
