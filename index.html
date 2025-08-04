@@ -2,131 +2,113 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Global Population Visualization</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Aging Population Tsunami</title>
   <script src="https://d3js.org/d3.v7.min.js"></script>
   <style>
     body {
       font-family: Arial, sans-serif;
       margin: 40px;
+      background-color: #f9f9f9;
     }
-    #chart {
-      margin-top: 40px;
+    h1 {
+      text-align: center;
     }
-    .bar {
-      fill: steelblue;
+    svg {
+      display: block;
+      margin: auto;
     }
-    .axis-label {
-      font-size: 12px;
+    .tooltip {
+      position: absolute;
+      background-color: white;
+      border: 1px solid #ccc;
+      padding: 6px;
+      font-size: 14px;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.2s;
     }
   </style>
 </head>
 <body>
-  <h1>Global Population Visualization</h1>
-  <p>Use the Console to call <code>window.loadData()</code> to load your own <code>population_data.csv</code>.</p>
+  <h1>Aging Population Tsunami Visualization</h1>
   <div id="chart"></div>
+  <div class="tooltip" id="tooltip"></div>
 
   <script>
-    // Make variables accessible in Console
-    window.globalData = null;
-    let currentScene = 0;
+    const margin = { top: 50, right: 30, bottom: 50, left: 60 },
+          width = 960 - margin.left - margin.right,
+          height = 500 - margin.top - margin.bottom;
 
-    // CSV Loading Function
-    window.loadData = async function () {
-      try {
-        console.log('Loading population data...');
-        const data = await d3.csv('population_data.csv');
-        window.globalData = processData(data);
-        console.log('Data loaded successfully:', window.globalData);
-        showScene(currentScene);
-      } catch (error) {
-        console.error('Error loading data:', error);
-        window.globalData = createSampleData();
-        showScene(currentScene);
-      }
-    };
+    const svg = d3.select("#chart")
+      .append("svg")
+      .attr("width", width + margin.left + margin.right)
+      .attr("height", height + margin.top + margin.bottom)
+      .append("g")
+      .attr("transform", `translate(${margin.left},${margin.top})`);
 
-    function processData(data) {
-      return data.map(d => ({
-        year: +d.year,
-        population: +d.population
-      }));
-    }
+    const tooltip = d3.select("#tooltip");
 
-    window.createSampleData = function () {
-      return [
-        { year: 2000, population: 6 },
-        { year: 2005, population: 6.5 },
-        { year: 2010, population: 7 },
-        { year: 2015, population: 7.3 },
-        { year: 2020, population: 7.8 }
-      ];
-    };
+    // 載入 CSV 資料
+    d3.csv("population_data.csv").then(data => {
+      // 資料預處理：轉換數值欄位
+      data.forEach(d => {
+        d.Year = +d.Year;
+        d["65+ Population"] = +d["65+ Population"];
+      });
 
-    function showScene(sceneIndex) {
-      d3.select('#chart').selectAll('*').remove(); // Clear chart
-      if (!window.globalData) return;
-
-      if (sceneIndex === 0) {
-        renderGlobalTrendChart(window.globalData);
-      } else {
-        // Other scenes if needed
-      }
-    }
-
-    window.renderGlobalTrendChart = function (data) {
-      const width = 600;
-      const height = 400;
-      const margin = { top: 20, right: 30, bottom: 50, left: 60 };
-
-      const svg = d3.select('#chart')
-        .append('svg')
-        .attr('width', width)
-        .attr('height', height);
-
-      const x = d3.scaleBand()
-        .domain(data.map(d => d.year))
-        .range([margin.left, width - margin.right])
-        .padding(0.1);
+      // 設定 X/Y 軸比例尺
+      const x = d3.scaleLinear()
+        .domain(d3.extent(data, d => d.Year))
+        .range([0, width]);
 
       const y = d3.scaleLinear()
-        .domain([0, d3.max(data, d => d.population)]).nice()
-        .range([height - margin.bottom, margin.top]);
+        .domain([0, d3.max(data, d => d["65+ Population"])])
+        .nice()
+        .range([height, 0]);
 
-      svg.append('g')
-        .selectAll('rect')
+      // X 軸
+      svg.append("g")
+        .attr("transform", `translate(0, ${height})`)
+        .call(d3.axisBottom(x).tickFormat(d3.format("d")));
+
+      // Y 軸
+      svg.append("g")
+        .call(d3.axisLeft(y));
+
+      // 折線圖
+      const line = d3.line()
+        .x(d => x(d.Year))
+        .y(d => y(d["65+ Population"]));
+
+      svg.append("path")
+        .datum(data)
+        .attr("fill", "none")
+        .attr("stroke", "#007acc")
+        .attr("stroke-width", 2)
+        .attr("d", line);
+
+      // 圓點 + tooltip
+      svg.selectAll("circle")
         .data(data)
-        .join('rect')
-        .attr('class', 'bar')
-        .attr('x', d => x(d.year))
-        .attr('y', d => y(d.population))
-        .attr('height', d => y(0) - y(d.population))
-        .attr('width', x.bandwidth());
+        .enter()
+        .append("circle")
+        .attr("cx", d => x(d.Year))
+        .attr("cy", d => y(d["65+ Population"]))
+        .attr("r", 4)
+        .attr("fill", "#007acc")
+        .on("mouseover", (event, d) => {
+          tooltip.style("opacity", 1)
+            .html(`<strong>Year:</strong> ${d.Year}<br/><strong>65+ Pop:</strong> ${d["65+ Population"].toLocaleString()}`)
+            .style("left", `${event.pageX + 10}px`)
+            .style("top", `${event.pageY - 28}px`);
+        })
+        .on("mouseout", () => {
+          tooltip.style("opacity", 0);
+        });
 
-      svg.append('g')
-        .attr('transform', `translate(0,${height - margin.bottom})`)
-        .call(d3.axisBottom(x).tickFormat(d3.format('d')))
-        .append('text')
-        .attr('x', width / 2)
-        .attr('y', 40)
-        .attr('fill', 'black')
-        .attr('text-anchor', 'middle')
-        .text('Year');
-
-      svg.append('g')
-        .attr('transform', `translate(${margin.left},0)`)
-        .call(d3.axisLeft(y))
-        .append('text')
-        .attr('transform', 'rotate(-90)')
-        .attr('x', -height / 2)
-        .attr('y', -40)
-        .attr('fill', 'black')
-        .attr('text-anchor', 'middle')
-        .text('Population (Billions)');
-    }
-
-    // Optional: auto-load fallback data for preview
-    window.addEventListener('DOMContentLoaded', () => {
-      console.log("Ready. Use window.loadData() in Console to load your CSV.");
+    }).catch(error => {
+      console.error("資料讀取失敗:", error);
     });
   </script>
 </body>
