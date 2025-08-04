@@ -335,6 +335,108 @@
         // Parameters - state variables for the narrative visualization
         let currentScene = 1;
         const totalScenes = 4;
+        let globalData = null; // Will store our CSV data
+        
+        // Load and process the CSV data
+        async function loadData() {
+            try {
+                console.log('Loading population data...');
+                const data = await d3.csv('population_data.csv');
+                
+                // Process the data for easier use
+                globalData = processData(data);
+                console.log('Data loaded successfully:', globalData);
+                
+                // Initialize visualization once data is loaded
+                showScene(currentScene);
+            } catch (error) {
+                console.error('Error loading data:', error);
+                // Fallback to sample data if CSV fails to load
+                globalData = createSampleData();
+                showScene(currentScene);
+            }
+        }
+        
+        // Process CSV data into usable format
+        function processData(rawData) {
+            // Get some key countries for visualization
+            const keyCountries = ['Japan', 'South Korea', 'China', 'Germany', 'United States', 'India', 'Nigeria'];
+            
+            const processedData = {
+                countries: [],
+                globalTrend: []
+            };
+            
+            // Process each row of CSV data
+            rawData.forEach(row => {
+                if (keyCountries.includes(row['Country Name'])) {
+                    const countryData = {
+                        name: row['Country Name'],
+                        code: row['Country Code'],
+                        values: []
+                    };
+                    
+                    // Extract years and values (World Bank data typically has years as columns)
+                    for (let year = 2000; year <= 2022; year++) {
+                        const value = parseFloat(row[year.toString()]);
+                        if (!isNaN(value)) {
+                            countryData.values.push({
+                                year: year,
+                                value: value
+                            });
+                        }
+                    }
+                    
+                    if (countryData.values.length > 0) {
+                        processedData.countries.push(countryData);
+                    }
+                }
+            });
+            
+            // Create global trend (simplified - using World average if available)
+            const worldRow = rawData.find(row => row['Country Name'] === 'World');
+            if (worldRow) {
+                for (let year = 2000; year <= 2022; year++) {
+                    const value = parseFloat(worldRow[year.toString()]);
+                    if (!isNaN(value)) {
+                        processedData.globalTrend.push({
+                            year: year,
+                            value: value
+                        });
+                    }
+                }
+            }
+            
+            return processedData;
+        }
+        
+        // Fallback sample data if CSV loading fails
+        function createSampleData() {
+            return {
+                globalTrend: [
+                    {year: 2000, value: 6.9},
+                    {year: 2005, value: 7.3},
+                    {year: 2010, value: 7.8},
+                    {year: 2015, value: 8.3},
+                    {year: 2020, value: 9.1},
+                    {year: 2022, value: 9.7}
+                ],
+                countries: [
+                    {
+                        name: 'Japan',
+                        values: [{year: 2000, value: 17.4}, {year: 2010, value: 23.0}, {year: 2020, value: 28.7}]
+                    },
+                    {
+                        name: 'South Korea', 
+                        values: [{year: 2000, value: 7.2}, {year: 2010, value: 11.1}, {year: 2020, value: 15.8}]
+                    },
+                    {
+                        name: 'China',
+                        values: [{year: 2000, value: 7.0}, {year: 2010, value: 8.4}, {year: 2020, value: 11.9}]
+                    }
+                ]
+            };
+        }
         
         // Scene management functions (Triggers)
         function showScene(sceneNum) {
@@ -349,8 +451,8 @@
             // Update navigation
             updateNavigation();
             
-            // TODO: Render appropriate chart for this scene
-            console.log(`Showing scene ${sceneNum}`);
+            // Render appropriate chart for this scene
+            renderChart(sceneNum);
         }
         
         function nextScene() {
@@ -373,10 +475,184 @@
             document.getElementById('sceneCounter').textContent = `${currentScene} / ${totalScenes}`;
         }
         
-        // Initialize the visualization
+        // Chart rendering functions
+        function renderChart(sceneNum) {
+            switch(sceneNum) {
+                case 1:
+                    renderGlobalTrendChart();
+                    break;
+                case 2:
+                    renderCountryComparisonChart();
+                    break;
+                case 3:
+                    renderAsianTrendsChart();
+                    break;
+                case 4:
+                    renderInteractiveChart();
+                    break;
+            }
+        }
+        
+        // Scene 1: Global trend line chart
+        function renderGlobalTrendChart() {
+            const container = d3.select("#chart1");
+            container.selectAll("*").remove();
+            
+            if (!globalData || !globalData.globalTrend || globalData.globalTrend.length === 0) {
+                container.append("p")
+                    .text("Loading global aging trend data...")
+                    .style("text-align", "center")
+                    .style("color", "#64748b");
+                return;
+            }
+            
+            const margin = {top: 20, right: 30, bottom: 50, left: 60};
+            const width = 700 - margin.left - margin.right;
+            const height = 400 - margin.top - margin.bottom;
+            
+            const svg = container
+                .append("svg")
+                .attr("width", width + margin.left + margin.right)
+                .attr("height", height + margin.top + margin.bottom);
+            
+            const g = svg.append("g")
+                .attr("transform", `translate(${margin.left},${margin.top})`);
+            
+            // Scales
+            const xScale = d3.scaleLinear()
+                .domain(d3.extent(globalData.globalTrend, d => d.year))
+                .range([0, width]);
+            
+            const yScale = d3.scaleLinear()
+                .domain([0, d3.max(globalData.globalTrend, d => d.value) * 1.1])
+                .range([height, 0]);
+            
+            // Line generator
+            const line = d3.line()
+                .x(d => xScale(d.year))
+                .y(d => yScale(d.value))
+                .curve(d3.curveMonotoneX);
+            
+            // Add gradient
+            const gradient = svg.append("defs")
+                .append("linearGradient")
+                .attr("id", "line-gradient")
+                .attr("gradientUnits", "userSpaceOnUse")
+                .attr("x1", 0).attr("y1", height)
+                .attr("x2", 0).attr("y2", 0);
+            
+            gradient.append("stop")
+                .attr("offset", "0%")
+                .attr("stop-color", "#667eea");
+            
+            gradient.append("stop")
+                .attr("offset", "100%")
+                .attr("stop-color", "#764ba2");
+            
+            // Draw line
+            g.append("path")
+                .datum(globalData.globalTrend)
+                .attr("fill", "none")
+                .attr("stroke", "url(#line-gradient)")
+                .attr("stroke-width", 4)
+                .attr("d", line);
+            
+            // Add dots
+            g.selectAll(".dot")
+                .data(globalData.globalTrend)
+                .enter().append("circle")
+                .attr("class", "dot")
+                .attr("cx", d => xScale(d.year))
+                .attr("cy", d => yScale(d.value))
+                .attr("r", 6)
+                .attr("fill", "#667eea")
+                .attr("stroke", "#fff")
+                .attr("stroke-width", 2)
+                .style("cursor", "pointer")
+                .on("mouseover", function(event, d) {
+                    // Simple tooltip
+                    const tooltip = d3.select("body").append("div")
+                        .attr("class", "tooltip")
+                        .style("position", "absolute")
+                        .style("background", "rgba(0,0,0,0.8)")
+                        .style("color", "white")
+                        .style("padding", "8px")
+                        .style("border-radius", "4px")
+                        .style("font-size", "12px")
+                        .style("pointer-events", "none")
+                        .html(`<strong>${d.year}</strong><br/>65+ Population: ${d.value.toFixed(1)}%`);
+                    
+                    tooltip.style("left", (event.pageX + 10) + "px")
+                        .style("top", (event.pageY - 10) + "px");
+                })
+                .on("mouseout", function() {
+                    d3.selectAll(".tooltip").remove();
+                });
+            
+            // X axis
+            g.append("g")
+                .attr("transform", `translate(0,${height})`)
+                .call(d3.axisBottom(xScale).tickFormat(d3.format("d")))
+                .style("font-size", "12px");
+            
+            // Y axis
+            g.append("g")
+                .call(d3.axisLeft(yScale))
+                .style("font-size", "12px");
+            
+            // X axis label
+            g.append("text")
+                .attr("transform", `translate(${width/2}, ${height + 40})`)
+                .style("text-anchor", "middle")
+                .style("font-size", "14px")
+                .style("font-weight", "600")
+                .style("fill", "#2d3748")
+                .text("Year");
+            
+            // Y axis label
+            g.append("text")
+                .attr("transform", "rotate(-90)")
+                .attr("y", 0 - margin.left + 15)
+                .attr("x", 0 - (height / 2))
+                .style("text-anchor", "middle")
+                .style("font-size", "14px")
+                .style("font-weight", "600")
+                .style("fill", "#2d3748")
+                .text("Population 65+ (% of total)");
+        }
+        
+        // Placeholder functions for other scenes
+        function renderCountryComparisonChart() {
+            const container = d3.select("#chart2");
+            container.selectAll("*").remove();
+            container.append("p")
+                .text("Country comparison chart coming next...")
+                .style("text-align", "center")
+                .style("color", "#64748b");
+        }
+        
+        function renderAsianTrendsChart() {
+            const container = d3.select("#chart3");
+            container.selectAll("*").remove();
+            container.append("p")
+                .text("Asian trends chart coming next...")
+                .style("text-align", "center")
+                .style("color", "#64748b");
+        }
+        
+        function renderInteractiveChart() {
+            const container = d3.select("#chart4");
+            container.selectAll("*").remove();
+            container.append("p")
+                .text("Interactive exploration chart coming next...")
+                .style("text-align", "center")
+                .style("color", "#64748b");
+        }
+        
+        // Initialize the visualization when DOM is loaded
         document.addEventListener('DOMContentLoaded', function() {
-            showScene(1);
-            console.log('Aging Tsunami visualization initialized');
+            console.log('Aging Tsunami visualization initializing...');
+            loadData();
         });
     </script>
 </body>
