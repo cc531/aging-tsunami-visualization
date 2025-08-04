@@ -381,23 +381,23 @@
             document.getElementById('nextBtn').disabled = (currentScene === totalScenes);
             document.getElementById('sceneCounter').textContent = `${currentScene} / ${totalScenes}`;
         }
-
+        
         function renderScene1Chart() {
             const svgWidth = 800;
             const svgHeight = 400;
             const margin = { top: 40, right: 20, bottom: 50, left: 60 };
-        
             const width = svgWidth - margin.left - margin.right;
             const height = svgHeight - margin.top - margin.bottom;
         
-            // Remove old chart if it exists
             d3.select("#chart1").select("svg").remove();
         
-            // Filter: pick top 10 countries by 60+ population in 2024
-            const top10 = globalData
-                .filter(d => d.Year === "2024")
-                .sort((a, b) => d3.descending(+a["Population 60+"], +b["Population 60+"]))
-                .slice(0, 10);
+            const yearlyTotal = d3.rollups(
+                globalData,
+                v => d3.sum(v, d => d["Population 60+"]),
+                d => d.Year
+            ).map(([year, total]) => ({ year: +year, total }));
+        
+            yearlyTotal.sort((a, b) => a.year - b.year); 
         
             const svg = d3.select("#chart1")
                 .append("svg")
@@ -406,61 +406,45 @@
                 .append("g")
                 .attr("transform", `translate(${margin.left},${margin.top})`);
         
-            const x = d3.scaleBand()
-                .domain(top10.map(d => d.Country))
-                .range([0, width])
-                .padding(0.1);
+            const x = d3.scaleLinear()
+                .domain(d3.extent(yearlyTotal, d => d.year))
+                .range([0, width]);
         
             const y = d3.scaleLinear()
-                .domain([0, d3.max(top10, d => +d["Population 60+"])])
+                .domain([0, d3.max(yearlyTotal, d => d.total)])
                 .nice()
                 .range([height, 0]);
         
-            const colorScale = d3.scaleOrdinal()
-                .domain(top10.map(d => d.Country))
-                .range(d3.schemeTableau10);
+            const line = d3.line()
+                .x(d => x(d.year))
+                .y(d => y(d.total))
+                .curve(d3.curveMonotoneX);
+        
+            svg.append("path")
+                .datum(yearlyTotal)
+                .attr("fill", "none")
+                .attr("stroke", "#4f46e5")
+                .attr("stroke-width", 3)
+                .attr("d", line)
+                .attr("stroke-dasharray", function() {
+                    const length = this.getTotalLength();
+                    return length + " " + length;
+                })
+                .attr("stroke-dashoffset", function() {
+                    return this.getTotalLength();
+                })
+                .transition()
+                .duration(2000)
+                .ease(d3.easeCubic)
+                .attr("stroke-dashoffset", 0);
         
             // Axes
-            svg.append("g")
-                .call(d3.axisLeft(y));
-        
+            svg.append("g").call(d3.axisLeft(y));
             svg.append("g")
                 .attr("transform", `translate(0, ${height})`)
-                .call(d3.axisBottom(x))
-                .selectAll("text")
-                .attr("transform", "rotate(-40)")
-                .style("text-anchor", "end");
-        
-            // Bars with animation
-            svg.selectAll(".bar")
-                .data(top10)
-                .enter()
-                .append("rect")
-                .attr("class", "bar")
-                .attr("x", d => x(d.Country))
-                .attr("y", height)
-                .attr("width", x.bandwidth())
-                .attr("height", 0)
-                .attr("fill", d => colorScale(d.Country))
-                .transition()
-                .duration(1000)
-                .ease(d3.easeCubicOut)
-                .attr("y", d => y(+d["Population 60+"]))
-                .attr("height", d => height - y(+d["Population 60+"]));
-        
-            // Labels on top of bars
-            svg.selectAll(".label")
-                .data(top10)
-                .enter()
-                .append("text")
-                .text(d => d["Population 60+"].toFixed(1) + "%")
-                .attr("x", d => x(d.Country) + x.bandwidth() / 2)
-                .attr("y", d => y(+d["Population 60+"]) - 5)
-                .attr("text-anchor", "middle")
-                .style("fill", "#333")
-                .style("font-size", "12px");
+                .call(d3.axisBottom(x).ticks(10).tickFormat(d3.format("d")));
         }
-
+  
 
         function transformData(data) {
             const transformed = [];
