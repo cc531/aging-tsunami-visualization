@@ -411,19 +411,7 @@
             const width = svgWidth - margin.left - margin.right;
             const height = svgHeight - margin.top - margin.bottom;
             
-            // Create tooltip div
-            const tooltip = d3.select(".tooltip")
-                .attr("class", "tooltip")
-                .style("opacity", 0)
-                .style("position", "absolute")
-                .style("background", "white")
-                .style("padding", "8px 12px")
-                .style("border", "1px solid #ccc")
-                .style("border-radius", "8px")
-                .style("pointer-events", "none")
-                .style("box-shadow", "0 4px 10px rgba(0,0,0,0.15)")
-                .style("font-size", "14px")
-                .style("color", "#2d3748");
+           
 
         
             d3.select("#chart1").select("svg").remove();
@@ -504,87 +492,6 @@
                 .call(d3.axisBottom(x).ticks(10).tickFormat(d3.format("d")));
         }
 
-        function renderScene2Chart() {
-            const svgWidth = 600;
-            const svgHeight = 400;
-            const margin = { top: 40, right: 20, bottom: 50, left: 80 };
-            const width = svgWidth - margin.left - margin.right;
-            const height = svgHeight - margin.top - margin.bottom;
-        
-            // Clear any existing chart
-            d3.select("#chart2").select("svg").remove();
-        
-            // Filter 2024 data for Japan, Nigeria, and Kenya
-            const countries = ["Japan", "Nigeria", "Kenya"];
-            const year = "2024";
-            const countryData = countries.map(country => {
-                const rows = globalData.filter(d => d.Country === country && d.Year === year);
-                const total = d3.sum(rows, d => d["Population 60+"]);
-                return { country, value: total };
-            });
-        
-            // Median age (hardcoded example data)
-            const medianAge = {
-                Japan: 48.6,
-                Nigeria: 18.1,
-                Kenya: 19.7
-            };
-        
-            // Create SVG
-            const svg = d3.select("#chart2")
-                .append("svg")
-                .attr("width", svgWidth)
-                .attr("height", svgHeight)
-                .append("g")
-                .attr("transform", `translate(${margin.left},${margin.top})`);
-        
-            const x = d3.scaleBand()
-                .domain(countries)
-                .range([0, width])
-                .padding(0.3);
-        
-            const y = d3.scaleLinear()
-                .domain([0, d3.max(countryData, d => d.value) * 1.2])
-                .range([height, 0]);
-        
-            const tooltip = d3.select(".tooltip");
-        
-            // Draw bars with animation and tooltip
-            svg.selectAll(".bar")
-                .data(countryData)
-                .enter()
-                .append("rect")
-                .attr("class", "bar")
-                .attr("x", d => x(d.country))
-                .attr("y", height)
-                .attr("width", x.bandwidth())
-                .attr("height", 0)
-                .attr("fill", "#6366f1")
-                .on("mouseover", (event, d) => {
-                    tooltip
-                        .style("opacity", 1)
-                        .html(
-                            `<strong>${d.country}</strong><br/>
-                            60+ Population: ${d3.format(",")(Math.round(d.value))}<br/>
-                            Median Age: ${medianAge[d.country]}`
-                        )
-                        .style("left", (event.pageX + 10) + "px")
-                        .style("top", (event.pageY - 28) + "px");
-                })
-                .on("mouseout", () => tooltip.style("opacity", 0))
-                .transition()
-                .duration(1000)
-                .attr("y", d => y(d.value))
-                .attr("height", d => height - y(d.value));
-        
-            // Axes
-            svg.append("g").call(d3.axisLeft(y));
-            svg.append("g")
-                .attr("transform", `translate(0,${height})`)
-                .call(d3.axisBottom(x));
-        }
-
-  
 
         function transformData(data) {
             const transformed = [];
