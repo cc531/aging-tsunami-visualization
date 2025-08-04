@@ -376,10 +376,11 @@
                 renderScene3Chart(); 
             } else if (sceneNum === 4) {
                 const selector = document.getElementById("countrySelector");
-                const selected = selector.value || "Japan"; 
-                selector.value = selected; 
-                renderScene4Chart(selected);
+                const defaultCountry = "Japan";
+                selector.value = defaultCountry;
+                renderScene4Chart(defaultCountry);
             }
+
 
             
             // Update navigation
