@@ -344,16 +344,21 @@
             document.querySelectorAll('.scene').forEach(scene => {
                 scene.classList.remove('active');
             });
-            
+        
             // Show current scene
             document.getElementById(`scene${sceneNum}`).classList.add('active');
-            
+        
+            // Call render function when needed
+            if (sceneNum === 1) {
+                renderScene1Chart();
+            }
+        
             // Update navigation
             updateNavigation();
-            
-            // TODO: Render appropriate chart for this scene
+        
             console.log(`Showing scene ${sceneNum}`);
         }
+
         
         function nextScene() {
             if (currentScene < totalScenes) {
