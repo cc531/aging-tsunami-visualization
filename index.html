@@ -388,6 +388,22 @@
             const margin = { top: 40, right: 20, bottom: 50, left: 60 };
             const width = svgWidth - margin.left - margin.right;
             const height = svgHeight - margin.top - margin.bottom;
+            
+            // Create tooltip div
+            const tooltip = d3.select("body")
+                .append("div")
+                .attr("class", "tooltip")
+                .style("opacity", 0)
+                .style("position", "absolute")
+                .style("background", "white")
+                .style("padding", "8px 12px")
+                .style("border", "1px solid #ccc")
+                .style("border-radius", "8px")
+                .style("pointer-events", "none")
+                .style("box-shadow", "0 4px 10px rgba(0,0,0,0.15)")
+                .style("font-size", "14px")
+                .style("color", "#2d3748");
+
         
             d3.select("#chart1").select("svg").remove();
         
@@ -437,6 +453,28 @@
                 .duration(2000)
                 .ease(d3.easeCubic)
                 .attr("stroke-dashoffset", 0);
+
+            // Add data points
+            svg.selectAll(".dot")
+                .data(yearlyTotal)
+                .enter()
+                .append("circle")
+                .attr("class", "dot")
+                .attr("cx", d => x(d.year))
+                .attr("cy", d => y(d.total))
+                .attr("r", 4)
+                .attr("fill", "#4f46e5")
+                .on("mouseover", (event, d) => {
+                    tooltip
+                        .style("opacity", 1)
+                        .html(`<strong>${d.year}</strong><br/>${d3.format(",")(Math.round(d.total))} people`)
+                        .style("left", (event.pageX + 10) + "px")
+                        .style("top", (event.pageY - 30) + "px");
+                })
+                .on("mouseout", () => {
+                    tooltip.style("opacity", 0);
+                });
+
         
             // Axes
             svg.append("g").call(d3.axisLeft(y));
