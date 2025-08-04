@@ -400,38 +400,6 @@
             console.log('Aging Tsunami visualization initialized');
         });
 
-        let currentScene = 1;
-        const totalScenes = 4;
-        let globalData = null;
-    
-        function showScene(sceneNum) {
-            document.querySelectorAll('.scene').forEach(scene => {
-                scene.classList.remove('active');
-            });
-            document.getElementById(`scene${sceneNum}`).classList.add('active');
-            updateNavigation();
-            console.log(`Showing scene ${sceneNum}`);
-        }
-    
-        function nextScene() {
-            if (currentScene < totalScenes) {
-                currentScene++;
-                showScene(currentScene);
-            }
-        }
-    
-        function previousScene() {
-            if (currentScene > 1) {
-                currentScene--;
-                showScene(currentScene);
-            }
-        }
-    
-        function updateNavigation() {
-            document.getElementById('prevBtn').disabled = (currentScene === 1);
-            document.getElementById('nextBtn').disabled = (currentScene === totalScenes);
-            document.getElementById('sceneCounter').textContent = `${currentScene} / ${totalScenes}`;
-        }
     
         async function loadData() {
             try {
