@@ -442,6 +442,9 @@
                 globalData = transformData(data); 
                 console.log("CSV loaded successfully:", globalData);
                 renderScene1Chart();
+
+                console.log{"First row sample:", globalData[0]};
+                
                 showScene(currentScene);
             } catch (err) {
             console.error("Failed to load CSV:", err);
