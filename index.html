@@ -374,7 +374,13 @@
                 renderScene2Chart(); 
             } else if (sceneNum === 3) {
                 renderScene3Chart(); 
-            } 
+            } else if (sceneNum === 4) {
+                const selector = document.getElementById("countrySelector");
+                const selected = selector.value || "Japan"; 
+                selector.value = selected; 
+                renderScene4Chart(selected);
+            }
+
             
             // Update navigation
             updateNavigation();
