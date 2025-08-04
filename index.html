@@ -611,17 +611,17 @@
         
             const years = [...new Set(filtered.map(d => +d.Year))].sort((a, b) => a - b);
             const x = d3.scaleLinear().domain(d3.extent(years)).range([0, width]);
-        
             const y = d3.scaleLinear()
-                .domain([0, d3.max(filtered, d => d["Population 60+"])])
+                .domain([0, 35]) 
                 .nice()
                 .range([height, 0]);
         
-            svg.append("g").call(d3.axisLeft(y));
+            svg.append("g")
+                .call(d3.axisLeft(y).tickFormat(d => d + "%")); 
             svg.append("g")
                 .attr("transform", `translate(0,${height})`)
-                .call(d3.axisBottom(x).tickFormat(d3.format("d")));
-        
+                .call(d3.axisBottom(x).tickFormat(d3.format("d"))); 
+    
             const line = d3.line()
                 .x(d => x(+d.Year))
                 .y(d => y(d["Population 60+"]))
@@ -651,7 +651,6 @@
                     .ease(d3.easeCubic)
                     .attr("stroke-dashoffset", 0);
         
-                // Dots + tooltip
                 svg.selectAll(`.dot-${country.replace(" ", "-")}`)
                     .data(data)
                     .enter()
@@ -664,16 +663,16 @@
                     .on("mouseover", (event, d) => {
                         tooltip
                             .style("opacity", 1)
-                            .html(`<strong>${d.Country}</strong><br>${d.Year}: ${d3.format(",")(Math.round(d["Population 60+"]))}`)
+                            .html(`<strong>${d.Country}</strong><br>${d.Year}: ${d3.format(".1f")(d["Population 60+"])}%`)
                             .style("left", (event.pageX + 10) + "px")
                             .style("top", (event.pageY - 28) + "px");
                     })
                     .on("mouseout", () => tooltip.style("opacity", 0));
             }
         
-            // 🔍 Annotation: highlight when Korea > Japan
-            const korea = nested.get("South Korea").filter(d => d.Year === "2045")[0];
-            const japan = nested.get("Japan").filter(d => d.Year === "2045")[0];
+        
+            const korea = nested.get("South Korea").find(d => d.Year === "2045");
+            const japan = nested.get("Japan").find(d => d.Year === "2045");
         
             if (korea && japan && korea["Population 60+"] > japan["Population 60+"]) {
                 const year = 2045;
