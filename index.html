@@ -514,10 +514,8 @@
             const width = svgWidth - margin.left - margin.right;
             const height = svgHeight - margin.top - margin.bottom;
         
-            // Clear any existing chart
             d3.select("#chart2").select("svg").remove();
         
-            // Filter 2024 data for Japan, Nigeria, and Kenya
             const countries = ["Japan", "Nigeria", "Kenya"];
             const year = "2024";
             const countryData = countries.map(country => {
@@ -526,14 +524,12 @@
                 return { country, value: total };
             });
         
-            // Median age (hardcoded example data)
             const medianAge = {
                 Japan: 48.6,
                 Nigeria: 18.1,
                 Kenya: 19.7
             };
         
-            // Create SVG
             const svg = d3.select("#chart2")
                 .append("svg")
                 .attr("width", svgWidth)
@@ -552,7 +548,6 @@
         
             const tooltip = d3.select(".tooltip");
         
-            // Draw bars with animation and tooltip
             svg.selectAll(".bar")
                 .data(countryData)
                 .enter()
@@ -568,7 +563,7 @@
                         .style("opacity", 1)
                         .html(
                             `<strong>${d.country}</strong><br/>
-                            60+ Population: ${d3.format(",")(Math.round(d.value))}<br/>
+                            60+ Population: ${d3.format(",")(Math.round(d.value))} million<br/>
                             Median Age: ${medianAge[d.country]}`
                         )
                         .style("left", (event.pageX + 10) + "px")
@@ -580,8 +575,8 @@
                 .attr("y", d => y(d.value))
                 .attr("height", d => height - y(d.value));
         
-            // Axes
-            svg.append("g").call(d3.axisLeft(y));
+            svg.append("g")
+                .call(d3.axisLeft(y).tickFormat(d => d + "M"));
             svg.append("g")
                 .attr("transform", `translate(0,${height})`)
                 .call(d3.axisBottom(x));
