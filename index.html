@@ -376,12 +376,72 @@
             document.getElementById('nextBtn').disabled = (currentScene === totalScenes);
             document.getElementById('sceneCounter').textContent = `${currentScene} / ${totalScenes}`;
         }
+
+        function renderScene1Chart() {
+            const svgWidth = 800;
+            const svgHeight = 400;
+            const margin = { top: 40, right: 20, bottom: 50, left: 60 };
+        
+            const width = svgWidth - margin.left - margin.right;
+            const height = svgHeight - margin.top - margin.bottom;
+        
+            // Remove old chart if it exists
+            d3.select("#chart1").select("svg").remove();
+        
+            const svg = d3.select("#chart1")
+                .append("svg")
+                .attr("width", svgWidth)
+                .attr("height", svgHeight)
+                .append("g")
+                .attr("transform", `translate(${margin.left},${margin.top})`);
+        
+            // Filter: pick top 10 countries by 60+ population in 2050
+            const top10 = globalData
+                .filter(d => d.Year === "2050")
+                .sort((a, b) => d3.descending(+a["Population 60+"], +b["Population 60+"]))
+                .slice(0, 10);
+        
+            const x = d3.scaleBand()
+                .domain(top10.map(d => d.Country))
+                .range([0, width])
+                .padding(0.1);
+        
+            const y = d3.scaleLinear()
+                .domain([0, d3.max(top10, d => +d["Population 60+"])])
+                .nice()
+                .range([height, 0]);
+        
+            // Axes
+            svg.append("g")
+                .call(d3.axisLeft(y));
+        
+            svg.append("g")
+                .attr("transform", `translate(0, ${height})`)
+                .call(d3.axisBottom(x))
+                .selectAll("text")
+                .attr("transform", "rotate(-40)")
+                .style("text-anchor", "end");
+        
+            // Bars
+            svg.selectAll(".bar")
+                .data(top10)
+                .enter()
+                .append("rect")
+                .attr("class", "bar")
+                .attr("x", d => x(d.Country))
+                .attr("y", d => y(+d["Population 60+"]))
+                .attr("width", x.bandwidth())
+                .attr("height", d => height - y(+d["Population 60+"]))
+                .attr("fill", "#667eea");
+        }
+
     
         async function loadData() {
             try {
                 const data = await d3.csv("https://raw.githubusercontent.com/cc531/aging-tsunami-visualization/main/population_data.csv");
                 globalData = data;
                 console.log("CSV loaded successfully:", globalData);
+                renderScene1Chart(); 
                 showScene(currentScene); // Start with the first scene after data is ready
             } catch (err) {
                 console.error("Failed to load CSV:", err);
