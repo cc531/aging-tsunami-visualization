@@ -1,116 +1,385 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Aging Population Tsunami</title>
-  <script src="https://d3js.org/d3.v7.min.js"></script>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 40px;
-      background-color: #f9f9f9;
-    }
-    h1 {
-      text-align: center;
-    }
-    svg {
-      display: block;
-      margin: auto;
-    }
-    .tooltip {
-      position: absolute;
-      background-color: white;
-      border: 1px solid #ccc;
-      padding: 6px;
-      font-size: 14px;
-      pointer-events: none;
-      opacity: 0;
-      transition: opacity 0.2s;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Global Aging Tsunami - A Demographic Revolution</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+      <style>
+        /* Modern design inspired by premium design systems */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            color: #2d3748;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+            padding: 60px 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(102, 126, 234, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="white" opacity="0.1"/><circle cx="75" cy="75" r="1" fill="white" opacity="0.1"/><circle cx="50" cy="10" r="0.5" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+            opacity: 0.1;
+        }
+        
+        .header h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            position: relative;
+            z-index: 1;
+            letter-spacing: -0.02em;
+        }
+        
+        .header p {
+            font-size: 1.25rem;
+            opacity: 0.9;
+            font-weight: 400;
+            position: relative;
+            z-index: 1;
+        }
+        
+        /* Scene cards with modern card design */
+        .scene {
+            display: none;
+            background: white;
+            border-radius: 20px;
+            padding: 50px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            margin-bottom: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+        
+        .scene.active {
+            display: block;
+            animation: slideIn 0.5s ease-out;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .scene h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #1a202c;
+            margin-bottom: 30px;
+            text-align: center;
+            letter-spacing: -0.025em;
+        }
+        
+        /* Modern annotation cards */
+        .annotation {
+            background: linear-gradient(135deg, #ffeaa7 0%, #fab1a0 100%);
+            padding: 25px 30px;
+            border-radius: 15px;
+            margin: 30px 0;
+            border: none;
+            box-shadow: 0 4px 15px rgba(255, 183, 77, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .annotation::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(to bottom, #fd79a8, #fdcb6e);
+        }
+        
+        .annotation strong {
+            color: #2d3748;
+            font-weight: 700;
+            font-size: 1.1em;
+        }
+        
+        .annotation p {
+            margin: 8px 0 0 0;
+            color: #2d3748;
+            font-size: 1rem;
+        }
+        
+        .chart-container {
+            margin: 40px 0;
+            padding: 40px;
+            background: #f8fafc;
+            border-radius: 15px;
+            border: 1px solid #e2e8f0;
+            min-height: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .chart-container p {
+            color: #64748b;
+            font-size: 1.1rem;
+            font-style: italic;
+        }
+        
+        /* Modern navigation */
+        .navigation {
+            text-align: center;
+            margin: 40px 0;
+            padding: 30px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+        }
+        
+        .nav-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .nav-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+        
+        .nav-btn:hover::before {
+            left: 100%;
+        }
+        
+        .nav-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+        
+        .nav-btn:disabled {
+            background: #e2e8f0;
+            color: #94a3b8;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .nav-btn:disabled::before {
+            display: none;
+        }
+        
+        .scene-counter {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #2d3748;
+            background: #f1f5f9;
+            padding: 12px 24px;
+            border-radius: 50px;
+            border: 2px solid #e2e8f0;
+        }
+        
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .header {
+                padding: 40px 25px;
+            }
+            
+            .header h1 {
+                font-size: 2.5rem;
+            }
+            
+            .scene {
+                padding: 30px 25px;
+            }
+            
+            .scene h2 {
+                font-size: 2rem;
+            }
+            
+            .navigation {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .nav-btn {
+                width: 100%;
+                max-width: 200px;
+            }
+        }
+    </style>
+     
+    </style>
 </head>
 <body>
-  <h1>Aging Population Tsunami Visualization</h1>
-  <div id="chart"></div>
-  <div class="tooltip" id="tooltip"></div>
-
-  <script>
-    const margin = { top: 50, right: 30, bottom: 50, left: 60 },
-          width = 960 - margin.left - margin.right,
-          height = 500 - margin.top - margin.bottom;
-
-    const svg = d3.select("#chart")
-      .append("svg")
-      .attr("width", width + margin.left + margin.right)
-      .attr("height", height + margin.top + margin.bottom)
-      .append("g")
-      .attr("transform", `translate(${margin.left},${margin.top})`);
-
-    const tooltip = d3.select("#tooltip");
-
-    // Load CSV file (must be served by GitHub Pages, not locally)
-    d3.csv("population_data.csv").then(data => {
-      // Convert Year and Population columns to numbers
-      data.forEach(d => {
-        d.Year = +d.Year;
-        d["65+ Population"] = +d["65+ Population"];
-      });
-
-      // Set up scales
-      const x = d3.scaleLinear()
-        .domain(d3.extent(data, d => d.Year))
-        .range([0, width]);
-
-      const y = d3.scaleLinear()
-        .domain([0, d3.max(data, d => d["65+ Population"])])
-        .nice()
-        .range([height, 0]);
-
-      // Add X Axis
-      svg.append("g")
-        .attr("transform", `translate(0, ${height})`)
-        .call(d3.axisBottom(x).tickFormat(d3.format("d")));
-
-      // Add Y Axis
-      svg.append("g")
-        .call(d3.axisLeft(y));
-
-      // Line generator
-      const line = d3.line()
-        .x(d => x(d.Year))
-        .y(d => y(d["65+ Population"]));
-
-      // Add line to SVG
-      svg.append("path")
-        .datum(data)
-        .attr("fill", "none")
-        .attr("stroke", "#007acc")
-        .attr("stroke-width", 2)
-        .attr("d", line);
-
-      // Add dots with tooltip
-      svg.selectAll("circle")
-        .data(data)
-        .enter()
-        .append("circle")
-        .attr("cx", d => x(d.Year))
-        .attr("cy", d => y(d["65+ Population"]))
-        .attr("r", 4)
-        .attr("fill", "#007acc")
-        .on("mouseover", (event, d) => {
-          tooltip
-            .style("opacity", 1)
-            .html(`<strong>Year:</strong> ${d.Year}<br/><strong>65+ Pop:</strong> ${d["65+ Population"].toLocaleString()}`)
-            .style("left", `${event.pageX + 10}px`)
-            .style("top", `${event.pageY - 28}px`);
-        })
-        .on("mouseout", () => {
-          tooltip.style("opacity", 0);
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>🌊 Global Aging Tsunami</h1>
+            <p>The Unprecedented Demographic Revolution</p>
+        </div>
+        
+        <!-- Scene 1: Global Overview -->
+        <div id="scene1" class="scene active">
+            <h2>Scene 1: The Global Aging Reality</h2>
+            <div class="annotation">
+                <strong>Key Message:</strong> By 2050, the global population aged 60+ will double from 1.1 billion to 2.1 billion people - that's like 1.3 million people entering old age every week!
+            </div>
+            <div class="chart-container">
+                <div id="chart1">
+                    <p>Chart 1 will be displayed here</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Scene 2: Country Comparison -->
+        <div id="scene2" class="scene">
+            <h2>Scene 2: Extreme Contrasts</h2>
+            <div class="annotation">
+                <strong>Shocking Discovery:</strong> Japan has 29% of population over 65, while Nigeria and Kenya have median ages of just 18-19 years. Same planet, different worlds!
+            </div>
+            <div class="chart-container">
+                <div id="chart2">
+                    <p>Chart 2 will be displayed here</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Scene 3: Asian Aging Race -->
+        <div id="scene3" class="scene">
+            <h2>Scene 3: The Asian Aging Race</h2>
+            <div class="annotation">
+                <strong>Critical Trend:</strong> South Korea will overtake Japan as the world's most aged society by 2045. China's elderly population will surge from 8.3% to 23.9%.
+            </div>
+            <div class="chart-container">
+                <div id="chart3">
+                    <p>Chart 3 will be displayed here</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Scene 4: Interactive Exploration (Martini Glass "bottom") -->
+        <div id="scene4" class="scene">
+            <h2>Scene 4: Explore the Data</h2>
+            <div class="annotation">
+                <strong>Interactive Feature:</strong> Now you can explore! Click on any country to see detailed aging trends and projections.
+            </div>
+            <div class="chart-container">
+                <div id="chart4">
+                    <p>Interactive chart will be displayed here</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Navigation (Triggers) -->
+        <div class="navigation">
+            <button class="nav-btn" id="prevBtn" onclick="previousScene()">← Previous</button>
+            <span class="scene-counter" id="sceneCounter">1 / 4</span>
+            <button class="nav-btn" id="nextBtn" onclick="nextScene()">Next →</button>
+        </div>
+    </div>
+    
+    <script>
+        // Parameters - state variables for the narrative visualization
+        let currentScene = 1;
+        const totalScenes = 4;
+        
+        // Scene management functions (Triggers)
+        function showScene(sceneNum) {
+            // Hide all scenes
+            document.querySelectorAll('.scene').forEach(scene => {
+                scene.classList.remove('active');
+            });
+            
+            // Show current scene
+            document.getElementById(`scene${sceneNum}`).classList.add('active');
+            
+            // Update navigation
+            updateNavigation();
+            
+            // TODO: Render appropriate chart for this scene
+            console.log(`Showing scene ${sceneNum}`);
+        }
+        
+        function nextScene() {
+            if (currentScene < totalScenes) {
+                currentScene++;
+                showScene(currentScene);
+            }
+        }
+        
+        function previousScene() {
+            if (currentScene > 1) {
+                currentScene--;
+                showScene(currentScene);
+            }
+        }
+        
+        function updateNavigation() {
+            document.getElementById('prevBtn').disabled = (currentScene === 1);
+            document.getElementById('nextBtn').disabled = (currentScene === totalScenes);
+            document.getElementById('sceneCounter').textContent = `${currentScene} / ${totalScenes}`;
+        }
+        
+        // Initialize the visualization
+        document.addEventListener('DOMContentLoaded', function() {
+            showScene(1);
+            console.log('Aging Tsunami visualization initialized');
         });
-    }).catch(error => {
-      console.error("Failed to load CSV:", error);
-    });
-  </script>
+    </script>
 </body>
 </html>
