@@ -770,22 +770,29 @@
         }
 
         function populateCountrySelector() {
-            const uniqueCountries = Array.from(new Set(globalData.map(d => d.Country))).sort();
             const selector = d3.select("#countrySelector");
+            const countries = Array.from(new Set(globalData.map(d => d.country))).sort();
         
-            uniqueCountries.forEach(country => {
-                selector.append("option")
-                    .attr("value", country)
-                    .text(country);
-            });
+            selector.selectAll("option")
+                .data(countries)
+                .enter()
+                .append("option")
+                .text(d => d)
+                .attr("value", d => d);
+        
+    
+            const defaultCountry = "Japan";
+            selector.property("value", defaultCountry);
+            renderScene4Chart(defaultCountry);
         
             selector.on("change", function () {
                 const selected = this.value;
                 if (selected) {
                     renderScene4Chart(selected);
                 }
-            });
+                    });
         }
+        
 
         function renderScene4Chart(selectedCountry) {
             const svgWidth = 800;
