@@ -334,13 +334,17 @@
                 <strong>Interactive Feature:</strong> Now you can explore! Click on any country to see detailed aging trends and projections.
             </div>
             <div class="chart-container">
-                <select id="countrySelector">
-                      <option value="">Select a Country</option>
+                <div class="selector-wrapper">
+                    <label for="countrySelector">🌍 Choose a country:</label>
+                    <select id="countrySelector">
+                        <option value="">Select a Country</option>
                     </select>
+                </div>
                 <div id="chart4">
                     <p>Interactive chart will be displayed here</p>
                 </div>
             </div>
+
         </div>
         
         <!-- Navigation (Triggers) -->
@@ -771,7 +775,8 @@
 
         function populateCountrySelector() {
             const selector = d3.select("#countrySelector");
-            const countries = Array.from(new Set(globalData.map(d => d.country))).sort();
+            const countries = Array.from(new Set(globalData.map(d => d.Country))).sort()
+
         
             selector.selectAll("option")
                 .data(countries)
