@@ -6,7 +6,6 @@
     <title>Global Aging Tsunami - A Demographic Revolution</title>
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <style>
-      <style>
         /* Modern design inspired by premium design systems */
         * {
             margin: 0;
@@ -261,7 +260,7 @@
                 max-width: 200px;
             }
         }
-    </style>
+
      
     </style>
 </head>
@@ -375,31 +374,6 @@
             document.getElementById('nextBtn').disabled = (currentScene === totalScenes);
             document.getElementById('sceneCounter').textContent = `${currentScene} / ${totalScenes}`;
         }
-
-        // Load and process the CSV data
-        async function loadData() {
-            try {
-                console.log('Loading population data...');
-                const data = await d3.csv("https://raw.githubusercontent.com/cc531/aging-tsunami-visualization/main/population_data.csv");
-                
-                globalData = data;
-                console.log('Data loaded successfully:', globalData);
-        
-                // Optional: You can render scene data here if needed
-                // renderSceneData(currentScene);
-            } catch (error) {
-                console.error('Error loading CSV:', error);
-            }
-        }
-
-        
-        // Initialize the visualization
-        document.addEventListener('DOMContentLoaded', function() {
-            showScene(1);
-            loadData(); // ← add this to load your CSV data
-            console.log('Aging Tsunami visualization initialized');
-        });
-
     
         async function loadData() {
             try {
@@ -412,8 +386,10 @@
             }
         }
     
+        // Initialize the visualization
         document.addEventListener('DOMContentLoaded', function() {
-            loadData();
+            showScene(1);
+            loadData(); // ← add this to load your CSV data
             console.log('Aging Tsunami visualization initialized');
         }); 
 
