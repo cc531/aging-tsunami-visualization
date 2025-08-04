@@ -397,7 +397,7 @@
         
             // Filter: pick top 10 countries by 60+ population in 2050
             const top10 = globalData
-                .filter(d => d.Year === "2050")
+                .filter(d => d.Year === "2024")
                 .sort((a, b) => d3.descending(+a["Population 60+"], +b["Population 60+"]))
                 .slice(0, 10);
         
@@ -435,6 +435,24 @@
                 .attr("fill", "#667eea");
         }
 
+        function transformData(data) {
+            const transformed = [];
+        
+            data.forEach(row => {
+                const country = row["Country Name"];
+                for (let year = 1960; year <= 2024; year++) {
+                    if (row[year] !== "") {
+                        transformed.push({
+                            Country: country,
+                            Year: String(year),
+                            "Population 60+": +row[year]
+                        });
+                    }
+                }
+            });
+        
+            return transformed;
+        }
          
         async function loadData() {
             try {
@@ -443,7 +461,7 @@
                 console.log("CSV loaded successfully:", globalData);
                 renderScene1Chart();
 
-                console.log{"First row sample:", globalData[0]};
+                console.log("First row sample:", globalData[0]);
                 
                 showScene(currentScene);
             } catch (err) {
