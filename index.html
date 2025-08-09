@@ -797,7 +797,7 @@
             }
         
         
-            const korea = nested.get("Korea, Rep").find(d => d.Year === "2045");
+            const korea = nested.get("Korea, Rep.").find(d => d.Year === "2045");
             const japan = nested.get("Japan").find(d => d.Year === "2045");
         
             if (korea && japan && korea["Population 60+"] > japan["Population 60+"]) {
