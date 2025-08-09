@@ -696,11 +696,11 @@
         
             d3.select("#chart3").select("svg").remove();
         
-            const countries = ["Japan", "Korea, Rep"];
+            const countries = ["Japan", "Korea, Rep", "China"];
             const countryColors = {
                 "Japan": "#6366f1",
-                "Korea, Rep": "#10b981"
-                
+                "Korea, Rep": "#10b981",
+                "China": "#f97316"
             };
         
             const filtered = globalData.filter(d => countries.includes(d.Country));
@@ -797,7 +797,7 @@
             }
         
         
-            const korea = nested.get("South Korea").find(d => d.Year === "2045");
+            const korea = nested.get("Korea, Rep").find(d => d.Year === "2045");
             const japan = nested.get("Japan").find(d => d.Year === "2045");
         
             if (korea && japan && korea["Population 60+"] > japan["Population 60+"]) {
