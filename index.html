@@ -741,8 +741,20 @@
         
             
             const dataWithForecast = addForecastData(globalData);
-            const filtered = dataWithForecast.filter(d => countries.includes(d.Country));
-            const nested = d3.group(filtered, d => d.Country);
+            
+            const uniqueData = [];
+            const seen = new Set();
+            
+            dataWithForecast.forEach(d => {
+                const key = `${d.Country}-${d.Year}`;
+                if (!seen.has(key) && countries.includes(d.Country)) {
+                    seen.add(key);
+                    uniqueData.push(d);
+                }
+            });
+
+            
+            const nested = d3.group(uniqueData, d => d.Country);
         
             const svg = d3.select("#chart3")
                 .append("svg")
@@ -750,8 +762,8 @@
                 .attr("height", svgHeight)
                 .append("g")
                 .attr("transform", `translate(${margin.left},${margin.top})`);
-        
-            const years = [...new Set(filtered.map(d => +d.Year))].sort((a, b) => a - b);
+    
+            const years = [...new Set(uniqueData.map(d => +d.Year))].sort((a, b) => a - b);
             const x = d3.scaleLinear().domain(d3.extent(years)).range([0, width]);
             
             const y = d3.scaleLinear()
