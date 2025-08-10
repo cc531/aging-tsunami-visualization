@@ -697,13 +697,51 @@
             d3.select("#chart3").select("svg").remove();
         
             const countries = ["Japan", "Korea, Rep.", "China"];
+
+            
+        function addForecastData(data) {
+            const forecast = [];
+            
+            
+            for (let year = 2021; year <= 2045; year++) {
+                forecast.push({
+                    Country: "Japan",
+                    Year: String(year),
+                    "Population 60+": 28 + (32 - 28) * (year - 2020) / (2045 - 2020)
+                });
+            }
+            
+            
+            for (let year = 2021; year <= 2045; year++) {
+                forecast.push({
+                    Country: "Korea, Rep.",
+                    Year: String(year),
+                    "Population 60+": 19 + (35 - 19) * (year - 2020) / (2045 - 2020)
+                });
+            }
+            
+            
+            for (let year = 2021; year <= 2045; year++) {
+                forecast.push({
+                    Country: "China", 
+                    Year: String(year),
+                    "Population 60+": 8.3 + (23.9 - 8.3) * (year - 2020) / (2045 - 2020)
+                });
+            }
+            
+            return [...data, ...forecast];
+        }
+
+            
             const countryColors = {
                 "Japan": "#6366f1",
                 "Korea, Rep.": "#10b981",
                 "China": "#f97316"
             };
         
-            const filtered = globalData.filter(d => countries.includes(d.Country));
+            
+            const dataWithForecast = addForecastData(globalData);
+            const filtered = dataWithForecast.filter(d => countries.includes(d.Country));
             const nested = d3.group(filtered, d => d.Country);
         
             const svg = d3.select("#chart3")
@@ -784,7 +822,7 @@
                     .attr("fill", "none")
                     .attr("stroke", countryColors[country])
                     .attr("stroke-width", 3)
-                    .attr("stroke-dasharray", "12 6")
+                    .attr("stroke-dasharray", "15 10")
                     .attr("d", line)
                     .attr("opacity", 0.8);
 
