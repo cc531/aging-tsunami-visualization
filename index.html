@@ -795,6 +795,7 @@
         
             for (const [country, data] of nested) {
                 data.sort((a, b) => +a.Year - +b.Year);
+                
                 const historicalData = data.filter(d => +d.Year <= 2020);
                 const forecastData = data.filter(d => +d.Year >= 2020);
         
@@ -822,7 +823,7 @@
                     .attr("fill", "none")
                     .attr("stroke", countryColors[country])
                     .attr("stroke-width", 3)
-                    .attr("stroke-dasharray", "15 10")
+                    .attr("stroke-dasharray", "8 5")
                     .attr("d", line)
                     .attr("opacity", 0.8);
 
@@ -835,19 +836,20 @@
                     .ease(d3.easeCubic)
                     .attr("stroke-dashoffset", 0);
         
-                svg.selectAll(`.dot-${country.replace(" ", "-")}`)
+                svg.selectAll(`.dot-${country.replace(/[^a-zA-Z0-9]/g, "-")}`)
                     .data(data)
                     .enter()
                     .append("circle")
-                    .attr("class", `dot-${country.replace(" ", "-")}`)
+                    .attr("class", `dot-${country.replace(/[^a-zA-Z0-9]/g, "-")}`)
                     .attr("cx", d => x(+d.Year))
                     .attr("cy", d => y(d["Population 60+"]))
-                    .attr("r", 4)
+                    .attr("r", 3)
                     .attr("fill", countryColors[country])
+                    .attr("opacity", d => +d.Year > 2020 ? 0.7 : 1)
                     .on("mouseover", (event, d) => {
                         tooltip
                             .style("opacity", 1)
-                            .html(`<strong>${d.Country}</strong><br>${d.Year}: ${d3.format(".1f")(d["Population 60+"])}%`)
+                            .html(`<strong>${d.Country}</strong><br/>${d.Year}: ${d3.format(".1f")(d["Population 60+"])}%${+d.Year > 2020 ? " (Forecast)" : ""}`)
                             .style("left", (event.pageX + 10) + "px")
                             .style("top", (event.pageY - 28) + "px");
                     })
