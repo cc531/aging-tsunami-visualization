@@ -757,9 +757,11 @@
         
             for (const [country, data] of nested) {
                 data.sort((a, b) => +a.Year - +b.Year);
+                const historicalData = data.filter(d => +d.Year <= 2020);
+                const forecastData = data.filter(d => +d.Year >= 2020);
         
                 const path = svg.append("path")
-                    .datum(data)
+                    .datum(historicalData)
                     .attr("fill", "none")
                     .attr("stroke", countryColors[country])
                     .attr("stroke-width", 3)
@@ -774,6 +776,24 @@
         
                 path.transition()
                     .duration(2000)
+                    .ease(d3.easeCubic)
+                    .attr("stroke-dashoffset", 0);
+                
+                const forecastPath = svg.append("path")
+                    .datum(forecastData)
+                    .attr("fill", "none")
+                    .attr("stroke", countryColors[country])
+                    .attr("stroke-width", 3)
+                    .attr("stroke-dasharray", "12 6")
+                    .attr("d", line)
+                    .attr("opacity", 0.8);
+
+                const forecastLength = forecastPath.node().getTotalLength();
+                forecastPath
+                    .attr("stroke-dashoffset", forecastLength)
+                    .transition()
+                    .delay(2000)
+                    .duration(1500)
                     .ease(d3.easeCubic)
                     .attr("stroke-dashoffset", 0);
         
