@@ -701,13 +701,20 @@
             
         function addForecastData(data) {
             const forecast = [];
+
+            const japan2020 = data.find(d => d.Country === "Japan" && d.Year === "2020");
+            const korea2020 = data.find(d => d.Country === "Korea, Rep." && d.Year === "2020");
+            const china2020 = data.find(d => d.Country === "China" && d.Year === "2020");
+            const japanStart = japan2020 ? japan2020["Population 60+"] : 29;
+            const koreaStart = korea2020 ? korea2020["Population 60+"] : 16;
+            const chinaStart = china2020 ? china2020["Population 60+"] : 12;
             
             
             for (let year = 2021; year <= 2045; year++) {
                 forecast.push({
                     Country: "Japan",
                     Year: String(year),
-                    "Population 60+": 28 + (32 - 28) * (year - 2020) / (2045 - 2020)
+                    "Population 60+": japanStart + (32 - japanStart) * (year - 2020) / (2045 - 2020)
                 });
             }
             
@@ -716,7 +723,7 @@
                 forecast.push({
                     Country: "Korea, Rep.",
                     Year: String(year),
-                    "Population 60+": 19 + (35 - 19) * (year - 2020) / (2045 - 2020)
+                    "Population 60+": koreaStart + (35 - koreaStart) * (year - 2020) / (2045 - 2020)
                 });
             }
             
@@ -725,7 +732,7 @@
                 forecast.push({
                     Country: "China", 
                     Year: String(year),
-                    "Population 60+": 8.3 + (23.9 - 8.3) * (year - 2020) / (2045 - 2020)
+                    "Population 60+": chinaStart + (23.9 - chinaStart) * (year - 2020) / (2045 - 2020)
                 });
             }
             
